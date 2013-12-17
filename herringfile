@@ -1,0 +1,65 @@
+"""
+Herring tasks for Versio.  Most tasks are generic and located in herringlib/.
+
+Add the following to your *requirements.txt* file:
+
+* herring
+* argparse
+
+"""
+import os
+
+from herring.herring_app import task, HerringFile
+from herringlib.project_settings import Project
+from herringlib.simple_logger import warning
+
+# Define our project environment.  Used by generic tasks in herringlib/
+
+Project.herringfile_dir = HerringFile.directory
+
+
+def env(name, default_value=None):
+    if name in os.environ:
+        return os.environ[name]
+    warning("The \"{name}\" environment variable is not set".format(name=name))
+    return default_value
+
+
+Project.metadata(
+    {
+        'name': 'Versio',
+        'package': 'versio',
+        'author': 'royw',
+        'author_email': 'roy@wright.org',
+        'description': 'Version manipulation library',
+        'script': 'versio',
+        'main': 'versio_app.py',
+        'dist_host': env('LOCAL_PYPI_HOST'),
+        'pypi_path': env('LOCAL_PYPI_PATH'),
+        'user': env('USER'),
+        'pylintrc': os.path.join(HerringFile.directory, 'pylint.rc'),
+        'pythonPath': ".:%s" % HerringFile.directory,
+
+        'quality_dir': 'quality',
+        'docs_dir': 'docs',
+        'uml_dir': 'docs/_src/uml',
+        'api_dir': 'docs/api',
+        'templates_dir': 'docs/_templates',
+        'report_dir': 'report',
+        'tests_dir': 'tests',
+        'dist_dir': 'dist',
+        'build_dir': 'build',
+        'egg_dir': "Versio.egg-info",
+    }
+)
+
+Project.required_files()
+
+from herringlib.version import get_project_version
+Project.version = get_project_version('versio')
+
+
+@task(depends=['build', 'doc', 'test'])
+def default():
+    """ The default task(s) to run when none are specified """
+    pass

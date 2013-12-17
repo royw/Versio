@@ -1,0 +1,15 @@
+[epydoc]
+
+name: {name}
+
+graph: classtree
+graph: callgraph
+graph: umlclasstree
+
+inheritance: listed
+
+modules: {package}
+
+output: html
+
+docformat: restructuredtext en

@@ -1,0 +1,11 @@
+include *.txt
+include herringfile
+include pylint.rc
+include MANIFEST.in
+recursive-include versio *.txt
+recursive-include versio *.js
+recursive-include versio *.html
+recursive-include versio *.css
+recursive-include docs *
+recursive-include tests *
+recursive-include herringlib *
