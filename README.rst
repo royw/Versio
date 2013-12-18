@@ -32,7 +32,7 @@ In addition, you may define your own version scheme by extending VersionScheme.
 
 The VersionScheme class defines the version scheme.
 
-A version scheme consists of:
+A version scheme consists of::
 
     * a name,
     * a regular expression used to parse the version string,
@@ -57,7 +57,7 @@ method, and there must be N unique names in the fields list.
 Installation
 ============
 
-From pypi:
+From pypi::
 
     pip install Versio
 
@@ -118,7 +118,7 @@ index like::
     >>> str(v1)
     '2.0.0'
 
-To use a name directly, we use the concept of subfields which are mapped to a field/index pair.
+To use a name directly, we use the concept of subfields which are mapped to a field/index pair::
 
     >>> Pep440VersionScheme.subfields
     {'tiny2': ['Release', 3], 'major': ['Release', 0], 'tiny': ['Release', 2], 'minor': ['Release', 1]}

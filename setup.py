@@ -58,10 +58,10 @@ setup(
                   'docs': ['*'],
                   'tests': ['*'],
                   'herringlib': ['*'],
-                  '': ['*.txt', '*.rc', 'herringfile', '*.in']},
+                  '': ['*.rst', '*.txt', '*.rc', 'herringfile', '*.in']},
     license='license.txt',
     description='Version manipulation library.',
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     install_requires=[
         # "argparse",
     ],
