@@ -218,4 +218,7 @@ Notice that bumping fails at the end of the sequence and the version is not chan
 
 That's it.
 
+There are more examples in *tests/version_test.py*.  You may test directly with *py.test* or against multiple
+python versions with *tox*.
+
 Enjoy!
