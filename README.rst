@@ -12,23 +12,23 @@ you may bump the minor part of '1.2.3' yielding '1.3.0').
 
 Four version schemes are included::
 
-    * Simple3VersionScheme which supports 3 numerical part versions (A.B.C where A, B, and C are integers)
-    * Simple4VersionScheme which supports 4 numerical part versions (A.B.C.D where A, B, C, and D are integers)
-    * Pep440VersionScheme which supports PEP 440 (http://www.python.org/dev/peps/pep-0440/) versions
+    * **Simple3VersionScheme** which supports 3 numerical part versions (A.B.C where A, B, and C are integers)
+    * **Simple4VersionScheme** which supports 4 numerical part versions (A.B.C.D where A, B, C, and D are integers)
+    * **Pep440VersionScheme** which supports PEP 440 (http://www.python.org/dev/peps/pep-0440/) versions
       (N[.N]+[{a|b|c|rc}N][.postN][.devN])
-    * PerlVersionScheme which supports 2 numerical part versions where the second part is at least two digits
+    * **PerlVersionScheme** which supports 2 numerical part versions where the second part is at least two digits
       (A.BB where A and B are integers and B is zero padded on the left.  For example:  1.02, 1.34, 1.567)
 
 If you don't specify which version scheme the version instance uses, then it will use the first scheme from the
-SupportedVersionSchemes list that successfully parses the version string
+**SupportedVersionSchemes** list that successfully parses the version string
 
-By default, Pep440VersionScheme is the supported scheme.  To change to a different list of schemes, use the
+By default, **Pep440VersionScheme** is the supported scheme.  To change to a different list of schemes, use the
 **Version.set_supported_version_schemes(schemes)**.  For example::
 
     from versio.version_scheme import Simple3VersionScheme, PerlVersionScheme
     Version.set_supported_version_schemes([Simple3VersionScheme, PerlVersionScheme])
 
-In addition, you may define your own version scheme by extending VersionScheme.
+In addition, you may define your own version scheme by creating a new VersionScheme instance.
 
 The VersionScheme class defines the version scheme.
 
@@ -41,7 +41,7 @@ A version scheme consists of::
     * an optional list of field types (if not specified, assumes all fields are strings),
     * a list of field names used for accessing the components of the version.
     * an optional subfield dictionary with the key being a field name and the value being a list of sub field names.
-      For example, in the Pep440VersionScheme, the "Release" field may contain multiple parts, so we use
+      For example, in the **Pep440VersionScheme**, the "Release" field may contain multiple parts, so we use
       subfield names for the parts.  Say we have a version of "1.2.3rc1", the "1.2.3" is the release field, then
       "1" is the "major" subfield, "2" is the "minor" subfield, and "3" is the "tiny" subfield.
     * a "clear" value used to set the field values to the right of the field being bumped,
@@ -65,7 +65,7 @@ From pypi::
 Usage
 =====
 
-First let's just play with the comparison and bumping versions::
+First let's just play with the comparing and bumping versions::
 
     >>> from versio.version import Version
     >>> from versio.version_scheme import Pep440VersionScheme
@@ -84,7 +84,7 @@ First let's just play with the comparison and bumping versions::
     >>> v1.bump('pre')
     True
 
-Now let's look in the scheme::
+Now let's look in the PEP 440 scheme::
 
     >>> Pep440VersionScheme.fields
     ['release', 'pre', 'post', 'dev']
@@ -102,7 +102,7 @@ do it here::
     >>> str(v1)
     '1.2.4'
 
-For PEP 440, the release part is defined as "N[.N]*".  We can bump specific parts of the release by using an
+For PEP 440, the release part is defined as "N[.N]+".  We can bump specific parts of the release by using an
 index like::
 
     >>> v1.bump('release', 2)
@@ -215,3 +215,7 @@ part of the group.  For example::
     '1.2.3rc1'
 
 Notice that bumping fails at the end of the sequence and the version is not changed.
+
+That's it.
+
+Enjoy!
