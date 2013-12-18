@@ -12,6 +12,7 @@ ordereddict
 pycabehtml
 pylint
 pymetrics
+pytest
 sphinx-bootstrap-theme
 sphinx-pyreverse
 sphinxcontrib-plantuml
@@ -19,4 +20,5 @@ sphinxcontrib-blockdiag
 sphinxcontrib-actdiag
 sphinxcontrib-nwdiag
 sphinxcontrib-seqdiag
+tox
 yolk

@@ -1,16 +1,5 @@
+# coding=utf-8
 """
-Generic version scheme support.
-"""
-import re
-from textwrap import dedent
-
-__docformat__ = 'restructuredtext en'
-
-__all__ = ('VersionScheme', 'Simple3VersionScheme', 'Simple4VersionScheme', 'Pep440VersionScheme', 'PerlVersionScheme')
-
-
-class VersionScheme(object):
-    """
     This class defines the version scheme used by Version.
 
     A version scheme consists of a
@@ -21,6 +10,10 @@ class VersionScheme(object):
         * format string used to reassemble the parsed version into a string,
         * optional list of field types (if not specified, assumes all fields are strings),
         * list of field names used for accessing the components of the version.
+        * an optional subfield dictionary with the key being a field name and the value being a list of sub field names.
+          For example, in the Pep440VersionScheme, the "Release" field may contain multiple parts, so we use
+          subfield names for the parts.  Say we have a version of "1.2.3rc1", the "1.2.3" is the release field, then
+          "1" is the "major" subfield, "2" is the "minor" subfield, and "3" is the "tiny" subfield.
         * a "clear" value used to set the field values to the right of the field being bumped,
         * a sequence dictionary where the keys are the field names and the values are a list of allowed values.
           The list must be in bump order.  Bumping the last value in the list has no effect.
@@ -30,7 +23,17 @@ class VersionScheme(object):
     if your version scheme has N parts, then the regular expression should match
     into N groups, the format string should expect N arguments to the str.format()
     method, and there must be N unique names in the fields list.
-    """
+"""
+import re
+from textwrap import dedent
+
+__docformat__ = 'restructuredtext en'
+
+__all__ = ('VersionScheme', 'Simple3VersionScheme', 'Simple4VersionScheme', 'Pep440VersionScheme', 'PerlVersionScheme')
+
+
+class VersionScheme(object):
+    """Describe a versioning scheme"""
 
     def __init__(self, name, parse_regex, clear_value, format_str, format_types=None, fields=None, subfields=None,
                  parse_flags=0, sequences=None, description=None):
@@ -53,6 +56,12 @@ class VersionScheme(object):
         self.description = description or name
 
     def parse(self, version_str):
+        """
+        Parse the version using this scheme from the given string.  Returns None if unable to parse.
+
+        :param version_str: A string that may contain a version in this version scheme.
+        :returns the parts of the version identified with the regular expression or None.
+        """
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         if match:
             return [item for item in match.groups()]
@@ -144,7 +153,7 @@ Pep440VersionScheme = VersionScheme(name="pep440",
 PerlVersionScheme = VersionScheme(name="A.B",
                                   parse_regex=r"^(\d+)\.(\d+)$",
                                   clear_value='0',
-                                  format_str="{:d}.{:02d}",
+                                  format_str="{0:d}.{1:02d}",
                                   format_types=[int, int],
                                   fields=['Major', 'Minor'],
                                   description='perl Major.Minor version scheme')

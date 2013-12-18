@@ -7,7 +7,7 @@ from setuptools import setup
 
 
 if version < '2.2.3':
-    print 'Versio requires python 2.6 or newer'
+    print('Versio requires python 2.6 or newer')
     exit(-1)
 
 VERSION_REGEX = r'__version__\s*=\s*[\'\"](\S+)[\'\"]'
@@ -51,7 +51,7 @@ setup(
     version=get_project_version(),
     author='royw',
     author_email='roy@wright.org',
-    url='http://github.com/royw/versio',
+    url='http://github.com/royw/Versio',
     packages=['versio'],
     package_dir={'': '.'},
     package_data={'versio': ['*.txt', '*.js', '*.html', '*.css'],

@@ -55,6 +55,11 @@ class Version(ComparableMixin):
 
     @classmethod
     def set_supported_version_schemes(cls, schemes):
+        """
+        Set the list of version schemes used when parsing a string.
+
+        :param schemes:  list of version schemes.
+        """
         cls.supported_version_schemes = list(schemes)
 
     def __init__(self, version_str=None, scheme=None):
@@ -81,9 +86,12 @@ class Version(ComparableMixin):
     def __str__(self):
         if self.parts:
             casts = self.scheme.format_types
-            parts = [part or '' for part in self.parts]
+            casts = casts + [str] * (len(self.scheme.fields) - len(casts))   # right fill with str types
 
-            def type_cast(value, cast):
+            parts = [part or '' for part in self.parts]
+            parts = parts + [''] * (len(self.scheme.fields) - len(parts))   # right fill with blanks
+
+            def _type_cast(value, cast):
                 if cast is None:
                     cast = str
                 result = None
@@ -94,7 +102,8 @@ class Version(ComparableMixin):
                     pass
                 return result
 
-            return self.scheme.format_str.format(*map(type_cast, parts, casts))
+            args = list(map(_type_cast, parts, casts))
+            return self.scheme.format_str.format(*args)
         return "Unknown version"
 
     def bump(self, field_name=None, sub_index=-1):
@@ -104,6 +113,8 @@ class Version(ComparableMixin):
 
         :param field_name: the field name that matches one of the scheme's fields
         :type field_name: object
+        :param sub_index: index in field
+        :type sub_index: int
         :return: True on success
         :rtype: bool
         """
@@ -129,7 +140,7 @@ class Version(ComparableMixin):
             return False
 
     def _increment(self, field_name, value):
-        if isinstance(value, (int, long)):
+        if isinstance(value, int):
             value += 1
         if isinstance(value, str):
             if field_name in self.scheme.sequences:
