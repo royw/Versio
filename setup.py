@@ -1,4 +1,4 @@
-# from distutils.core import setup
+# coding=utf-8
 import os
 import re
 from sys import version
@@ -64,11 +64,5 @@ setup(
     long_description=open('README.txt').read(),
     install_requires=[
         # "argparse",
-        # "mako"
-        # "Foo >= 1.2.3"
     ],
-
-    # entry_points={
-    #     'console_scripts': ['versio = versio.versio_app:main']
-    # }
 )
