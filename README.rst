@@ -10,7 +10,7 @@ Latin
 Versio is a generic version class that supports comparison and version bumping (incrementing by part, for example
 you may bump the minor part of '1.2.3' yielding '1.3.0').
 
-Four version schemes are included::
+Four version schemes are included:
 
     * **Simple3VersionScheme** which supports 3 numerical part versions (A.B.C where A, B, and C are integers)
     * **Simple4VersionScheme** which supports 4 numerical part versions (A.B.C.D where A, B, C, and D are integers)
@@ -32,7 +32,7 @@ In addition, you may define your own version scheme by creating a new VersionSch
 
 The VersionScheme class defines the version scheme.
 
-A version scheme consists of::
+A version scheme consists of:
 
     * a name,
     * a regular expression used to parse the version string,
