@@ -124,15 +124,18 @@ class Version(ComparableMixin):
 
         # noinspection PyBroadException
         try:
+            bumped = False
             index = self.scheme.fields.index(field_name)
             for idx, part in enumerate(self.parts):
                 if idx == index:
-                    self.parts[idx] = self._bump_parse(field_name, part, sub_index)
+                    bumped_part = self._bump_parse(field_name, part, sub_index)
+                    if self.parts[idx] != bumped_part:
+                        self.parts[idx] = bumped_part
+                        bumped = True
 
                 if idx > index:
                     self.parts[idx] = self.scheme.clear_value
-
-            return True
+            return bumped
         except:
             # not if fields, try subfields
             if field_name in self.scheme.subfields:
@@ -145,32 +148,43 @@ class Version(ComparableMixin):
         if isinstance(value, str):
             if field_name in self.scheme.sequences:
                 seq_list = self.scheme.sequences[field_name]
+                if not value:
+                    return seq_list[0]
                 if value not in seq_list:
                     raise AttributeError('Can not bump version, the current value (%s) not in sequence constraints' %
                                          value)
                 idx = seq_list.index(value) + 1
                 if idx < len(seq_list):
                     return seq_list[idx]
+                else:
+                    raise IndexError('Can not increment past end of sequence')
             else:
                 value = chr(ord(value) + 1)
         return value
 
-    def _part_increment(self, field_name, sub_index, separator, sub_parts):
+    def _part_increment(self, field_name, sub_index, separator, sub_parts, clear_value):
         sub_parts[sub_index] = self._increment(field_name, sub_parts[sub_index])
         if sub_index >= 0:
             for sub_idx in range(sub_index + 1, len(sub_parts)):
-                sub_parts[sub_idx] = 0
+                sub_parts[sub_idx] = clear_value
         return separator.join([str(n) for n in sub_parts])
 
     def _bump_parse(self, field_name, part, sub_index):
+        if part is None:
+            value = self.scheme.clear_value or '1'
+            return '{seq}{value}'.format(seq=self.scheme.sequences[field_name][0], value=value)
+
         match = re.match('^\d[\.\d]*(?<=\d)$', part)
         if match:
             # dotted numeric (ex: '1.2.3')
-            return self._part_increment(field_name, sub_index, '.', [int(n) for n in part.split('.')])
+            return self._part_increment(field_name, sub_index, '.', [int(n) for n in part.split('.')],
+                                        self.scheme.clear_value or '0'
+            )
 
         match = re.match(r'(\.?[a-zA-Z]*)(\d+)', part)
         if match:
             #  alpha + numeric (ex: 'a1', 'rc2', '.post3')
-            return self._part_increment(field_name, sub_index, '', [match.group(1) or '', int(match.group(2))])
+            return self._part_increment(field_name, sub_index, '', [match.group(1) or '', int(match.group(2))],
+                                        self.scheme.clear_value or '1')
 
         return part

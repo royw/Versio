@@ -165,65 +165,65 @@ class TestVersion(object):
         assert (v1.bump('dev'))
         assert (str(v1) == '1.2.3a4.post5.dev7')
 
-        assert (v1.bump('dev', 0))
-        assert (str(v1) == '1.2.3a4.post5.dev0')
+        assert (not v1.bump('dev', 0))
+        assert (str(v1) == '1.2.3a4.post5.dev7')
 
         assert (v1.bump('dev', 1))
-        assert (str(v1) == '1.2.3a4.post5.dev1')
+        assert (str(v1) == '1.2.3a4.post5.dev8')
 
-        v1.bump('post')
+        assert (v1.bump('post'))
         assert (str(v1) == '1.2.3a4.post6')
-        v1.bump('post', 0)
-        assert (str(v1) == '1.2.3a4.post0')
-        v1.bump('post', 1)
-        assert (str(v1) == '1.2.3a4.post1')
+        assert (not v1.bump('post', 0))
+        assert (str(v1) == '1.2.3a4.post6')
+        assert (v1.bump('post', 1))
+        assert (str(v1) == '1.2.3a4.post7')
 
-        v1.bump('pre')
+        assert (v1.bump('pre'))
         assert (str(v1) == '1.2.3a5')
-        v1.bump('pre', 0)
-        assert (str(v1) == '1.2.3b0')
-        v1.bump('pre', 0)
-        assert (str(v1) == '1.2.3c0')
-        v1.bump('pre', 0)
-        assert (str(v1) == '1.2.3rc0')
-        v1.bump('pre', 0)
-        assert (str(v1) == '1.2.3rc0')
+        assert (v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3b1')
+        assert (v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3c1')
+        assert (v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3rc1')
+        assert (not v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3rc1')
 
-        v1.bump('release')
+        assert (v1.bump('release'))
         assert (str(v1) == '1.2.4')
-        v1.bump('release', 2)
+        assert (v1.bump('release', 2))
         assert (str(v1) == '1.2.5')
-        v1.bump('release', 1)
+        assert (v1.bump('release', 1))
         assert (str(v1) == '1.3.0')
-        v1.bump('release', 0)
+        assert (v1.bump('release', 0))
         assert (str(v1) == '2.0.0')
 
         v1 = Version('1.2.3a4.post5.dev6')
-        v1.bump('post')
+        assert (v1.bump('post'))
         assert (str(v1) == '1.2.3a4.post6')
 
         v1 = Version('1.2.3a4.post5.dev6')
-        v1.bump('pre')
+        assert (v1.bump('pre'))
         assert (str(v1) == '1.2.3a5')
 
         v1 = Version('1.2.3a4.post5.dev6')
-        v1.bump('pre', 0)
-        assert (str(v1) == '1.2.3b0')
+        assert (v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3b1')
 
         v1 = Version('1.2.3a4.post5.dev6')
-        v1.bump('release')
+        assert (v1.bump('release'))
         assert (str(v1) == '1.2.4')
 
         v1 = Version('1.2.3a4.post5.dev6')
-        v1.bump('release', 2)
+        assert (v1.bump('release', 2))
         assert (str(v1) == '1.2.4')
 
         v1 = Version('1.2.3a4.post5.dev6')
-        v1.bump('release', 1)
+        assert (v1.bump('release', 1))
         assert (str(v1) == '1.3.0')
 
         v1 = Version('1.2.3a4.post5.dev6')
-        v1.bump('release', 0)
+        assert (v1.bump('release', 0))
         assert (str(v1) == '2.0.0')
 
     def test_pep440_bump_subfields(self):
@@ -238,6 +238,36 @@ class TestVersion(object):
         assert (str(v1) == '2.0.0.0')
 
     def test_pep440_bump_errors(self):
-        v1 = Version('1.2.3a4.post5.dev6')
+        v1 = Version('1.2.3a4.post5.dev6', scheme=Pep440VersionScheme)
         assert (not v1.bump('release', 3))
         assert (str(v1) == '1.2.3a4.post5.dev6')
+
+    def test_pep440_bump_sequences(self):
+        v1 = Version('1.2.3a4.post5.dev6', scheme=Pep440VersionScheme)
+        assert (not v1.bump('dev', 0))
+        assert (str(v1) == '1.2.3a4.post5.dev6')
+
+        assert (not v1.bump('post', 0))
+        assert (str(v1) == '1.2.3a4.post5.dev6')
+
+        assert (v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3b1')
+        assert (v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3c1')
+        assert (v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3rc1')
+        assert (not v1.bump('pre', 0))
+        assert (str(v1) == '1.2.3rc1')
+
+    def test_pep440_bump_pre(self):
+        v1 = Version('1.2.3', scheme=Pep440VersionScheme)
+        assert (v1.bump('pre', 0), str(v1))
+        assert (str(v1) == '1.2.3a1')
+        assert (v1.bump('pre', 1), str(v1))
+        assert (str(v1) == '1.2.3a2')
+
+        assert (v1.bump('post', 0), str(v1))
+        assert (str(v1) == '1.2.3a2.post1')
+
+        assert (v1.bump('dev', 0), str(v1))
+        assert (str(v1) == '1.2.3a2.post1.dev1')
