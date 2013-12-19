@@ -1,4 +1,9 @@
 dist/
-docs/
+docs/_build
+docs/_src
+docs/api
+docs/_templates
+docs/docs.log
 Versio.egg-info/
 .tox/
+build/
