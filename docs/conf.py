@@ -311,7 +311,6 @@ html_theme_path = ['_themes']
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #html_logo = None
-# html_logo = "_static/hp_logo_mn.gif"
 html_logo = "_static/R.png"
 
 # The name of an image file (within the static path) to use as favicon of the
