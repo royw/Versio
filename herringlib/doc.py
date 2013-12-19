@@ -253,21 +253,21 @@ if packages_required(required_packages):
             _create_module_diagrams(path)
             _create_class_diagrams(path)
 
-    @task(depends=['api_doc', 'doc_diagrams', 'update_readme'])
+    @task(depends=['api_doc', 'doc_diagrams'])
     def sphinx_docs():
         """Generate sphinx API documents"""
         _customize_doc_src_files()
         with cd(Project.docs_dir):
-            os.system('PYTHONPATH=%s sphinx-build -b html -d _build/doctrees -w docs.log -a -E -n . _build/html' %
-                      Project.pythonPath)
+            os.system('PYTHONPATH={pythonpath} sphinx-build -b html -d _build/doctrees -w docs.log '
+                      '-a -E -n . ../{htmldir}'.format(pythonpath=Project.pythonPath, htmldir=Project.docs_html_dir))
             clean_doc_log('docs.log')
 
     @task()
     def idoc():
         """Incremental build docs for testing purposes"""
         with cd(Project.docs_dir):
-            os.system('PYTHONPATH=%s sphinx-build -b html -d _build/doctrees -w docs.log -n . _build/html' %
-                      Project.pythonPath)
+            os.system('PYTHONPATH={pythonpath} sphinx-build -b html -d _build/doctrees -w docs.log '
+                      '-n . ../{htmldir}'.format(pythonpath=Project.pythonPath, htmldir=Project.docs_html_dir))
             clean_doc_log('docs.log')
 
     @task(depends=['api_doc'])
@@ -287,13 +287,6 @@ if packages_required(required_packages):
     def doc_post_clean():
         """Generate docs then clean up afterwards"""
         clean()
-
-    @task()
-    def update_readme():
-        """Update the README.txt from the application's --longhelp output"""
-        text = system("%s --longhelp" % os.path.join(Project.herringfile_dir, Project.package, Project.main))
-        with open("README.txt", 'w') as readme_file:
-            readme_file.write(text)
 
     @task(depends=['doc_clean'])
     def rstlint():

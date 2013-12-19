@@ -2,7 +2,7 @@
 """
     This class defines the version scheme used by Version.
 
-    A version scheme consists of a
+    A version scheme consists of a::
 
         * name,
         * regular expression used to parse the version string,
@@ -60,7 +60,7 @@ class VersionScheme(object):
         Parse the version using this scheme from the given string.  Returns None if unable to parse.
 
         :param version_str: A string that may contain a version in this version scheme.
-        :returns the parts of the version identified with the regular expression or None.
+        :returns: the parts of the version identified with the regular expression or None.
         """
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         if match:
