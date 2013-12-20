@@ -10,6 +10,7 @@ nose
 numpy
 ordereddict
 pycabehtml
+pycrypto
 pylint
 pymetrics
 pytest
