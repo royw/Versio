@@ -6,7 +6,7 @@ Helper for verifying that 3rd party applications are available for use.
 
 __docformat__ = 'restructuredtext en'
 
-from runner import system
+from local_shell import LocalShell
 from simple_logger import warning
 
 HELP = {
@@ -26,11 +26,12 @@ def executables_available(executable_list):
     :return: asserted if all are available
     :rtype: bool
     """
-    for executable in executable_list:
-        if not system("which {name}".format(name=executable), verbose=False).strip():
-            if executable in HELP:
-                warning(HELP[executable])
-            else:
-                warning("Please install: %s" % executable)
-            return False
+    with LocalShell() as local:
+        for executable in executable_list:
+            if not local.system("which {name}".format(name=executable), verbose=False).strip():
+                if executable in HELP:
+                    warning(HELP[executable])
+                else:
+                    warning("Please install: %s" % executable)
+                return False
     return True

@@ -16,9 +16,10 @@ required_packages = [
 ]
 
 if packages_required(required_packages):
-    from runner import script
+    from local_shell import LocalShell
 
     @task(help='You may append behave options when invoking the features task.')
     def features():
         """Run behave features"""
-        script('behave {features} {args}'.format(features=Project.features_dir, args=' '.join(task.argv)))
+        with LocalShell() as local:
+            local.script('behave {features} {args}'.format(features=Project.features_dir, args=' '.join(task.argv)))

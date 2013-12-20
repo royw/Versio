@@ -14,16 +14,16 @@ Each project must define it's metadata and directory structure.  This is usually
             'name': 'Herring',
             'package': 'herring',
             'author': 'Roy Wright',
-            'author_email': 'roy@wright.org',
+            'author_email': 'roy.wright@hp.com',
             'description': '',
             'script': 'herring',
             'main': 'herring_app.py',
             'version': version,
-            'dist_host': 'pypi-server.example.com',
+            'dist_host': 'tpcvm143.austin.hp.com',
             'pypi_path': '/var/pypi/dev',
             'user': os.environ['USER'],
             'pylintrc': os.path.join(HerringFile.directory, 'pylint.rc'),
-            'pythonPath': ".:%s" % HerringFile.directory,
+            'python_path': ".:%s" % HerringFile.directory,
 
             'quality_dir': 'quality',
             'docs_dir': 'docs',
@@ -80,10 +80,11 @@ import fnmatch
 import os
 import re
 import shutil
-from herring.herring_app import task, run
+from herring.herring_app import task
 from simple_logger import debug, info, error
+from local_shell import LocalShell
 
-__author__ = 'royw'
+__author__ = 'wrighroy'
 
 
 installed_packages = None
@@ -100,17 +101,18 @@ def packages_required(package_names):
     """
     result = True
 
-    packages = run(['yolk', '-l'], verbose=False).split("\n")
-    global installed_packages
-    if installed_packages is None:
-        installed_packages = [name.split()[0].lower() for name in packages if name]
+    with LocalShell() as local:
+        packages = local.run(['yolk', '-l'], verbose=False).split("\n")
+        global installed_packages
+        if installed_packages is None:
+            installed_packages = [name.split()[0].lower() for name in packages if name]
 
-    # info("installed_packages: %s" % repr(cls.installed_packages))
+        # info("installed_packages: %s" % repr(cls.installed_packages))
 
-    for pkg_name in package_names:
-        if pkg_name.lower() not in installed_packages:
-            print(pkg_name + " not installed!")
-            result = False
+        for pkg_name in package_names:
+            if pkg_name.lower() not in installed_packages:
+                print(pkg_name + " not installed!")
+                result = False
     return result
 
 
@@ -137,13 +139,12 @@ if packages_required(['ordereddict']):
                 if key.endswith('_dir'):
                     self.__directory(value)
 
-            required = {
-                'name': 'ProjectName',
-                'package': 'package',
-                'author': 'Author Name',
-                'author_email': 'author@example.com',
-                'description': 'Describe the project here.',
-            }
+            required = {'name': 'ProjectName',
+                        'package': 'package',
+                        'author': 'Author Name',
+                        'author_email': 'author@example.com',
+                        'description': 'Describe the project here.',
+                        }
             for key in required:
                 if key not in self.__dict__:
                     self.__setattr__(key, required[key])

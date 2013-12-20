@@ -35,7 +35,7 @@ required_packages = [
 ]
 
 if packages_required(required_packages):
-    from runner import system
+    from local_shell import LocalShell
 
     @task(depends=['cheesecake', 'lint', 'complexity'])
     def metrics():
@@ -47,10 +47,11 @@ if packages_required(required_packages):
         if not executables_available(['cheesecake_index']):
             return
         cheesecake_log = os.path.join(Project.quality_dir, 'cheesecake.log')
-        system("cheesecake_index --path=dist/%s-%s.tar.gz --keep-log -l %s" %
-               (Project.name,
-                Project.version,
-                cheesecake_log))
+        with LocalShell() as local:
+            local.system("cheesecake_index --path=dist/%s-%s.tar.gz --keep-log -l %s" %
+                         (Project.name,
+                          Project.version,
+                          cheesecake_log))
 
     @task()
     def lint():
@@ -61,7 +62,8 @@ if packages_required(required_packages):
         if os.path.exists(Project.pylintrc):
             options += "--rcfile=pylint.rc"
         pylint_log = os.path.join(Project.quality_dir, 'pylint.log')
-        system("pylint {options} {dir} > {log}".format(options=options, dir=Project.package, log=pylint_log))
+        with LocalShell() as local:
+            local.system("pylint {options} {dir} > {log}".format(options=options, dir=Project.package, log=pylint_log))
 
     @task()
     def complexity():
@@ -73,9 +75,10 @@ if packages_required(required_packages):
         graph = os.path.join(quality_dir, 'output.png')
         acc = os.path.join(quality_dir, 'complexity_acc.txt')
         metrics_html = os.path.join(quality_dir, 'complexity_metrics.html')
-        system("touch %s" % complexity_txt)
-        system("touch %s" % acc)
-        system("pymetrics --nosql --nocsv `find %s/ -iname \"*.py\"` > %s" %
-               (Project.package, complexity_txt))
-        system("pycabehtml.py -i %s -o %s -a %s -g %s" %
-               (complexity_txt, metrics_html, acc, graph))
+        with LocalShell() as local:
+            local.system("touch %s" % complexity_txt)
+            local.system("touch %s" % acc)
+            local.system("pymetrics --nosql --nocsv `find %s/ -iname \"*.py\"` > %s" %
+                         (Project.package, complexity_txt))
+            local.system("pycabehtml.py -i %s -o %s -a %s -g %s" %
+                         (complexity_txt, metrics_html, acc, graph))

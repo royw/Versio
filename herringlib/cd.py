@@ -9,10 +9,10 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
+
 # yes, I know "cd" is a bad class name.  I just like:  "with cd(path):"
 # pylint: disable=C0103
-
-
+#noinspection PyPep8Naming
 class cd(object):
     """
     Change directory, execute block, restore directory.

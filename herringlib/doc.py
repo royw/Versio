@@ -20,16 +20,17 @@ Add the following to your *requirements.txt* file:
 * sphinxcontrib-seqdiag
 
 """
+import shutil
 
 __docformat__ = 'restructuredtext en'
 
 import fnmatch
 import os
 import re
-from herring.herring_app import task, run
-from runner import system
+from herring.herring_app import task
 from simple_logger import info, warning
 from project_settings import Project, packages_required
+from local_shell import LocalShell
 
 required_packages = [
     'Pygments',
@@ -47,7 +48,7 @@ if packages_required(required_packages):
     from clean import clean
     from executables import executables_available
     from recursively_remove import recursively_remove
-    from safe_edit import safe_edit
+    from safe_edit import safe_edit, quick_edit
 
     @task(depends=['clean'])
     def doc_clean():
@@ -253,7 +254,7 @@ if packages_required(required_packages):
             _create_module_diagrams(path)
             _create_class_diagrams(path)
 
-    @task(depends=['api_doc', 'doc_diagrams'])
+    @task(depends=['api_doc', 'doc_diagrams', 'sphinx_logo'])
     def sphinx_docs():
         """Generate sphinx API documents"""
         _customize_doc_src_files()
@@ -274,9 +275,8 @@ if packages_required(required_packages):
     def epy_docs():
         """Generate epy API documents"""
         with cd(Project.docs_dir):
-            cmd_args = ['epydoc', '-v', '--output', '_epy', '--graph', 'all', 'bin', 'db', 'dst', 'dut', 'lab',
-                        'otto', 'pc', 'tests', 'util']
-            run(cmd_args)
+            with LocalShell as local:
+                local.run('epydoc -v --output _epy --graph all bin db dst dut lab otto pc tests util')
 
     @task(depends=['sphinx_docs'])
     def doc():
@@ -288,7 +288,7 @@ if packages_required(required_packages):
         """Generate docs then clean up afterwards"""
         clean()
 
-    @task(depends=['doc_clean'])
+    @task(depends=['docClean'])
     def rstlint():
         """Check the RST in the source files"""
         if not executables_available(['rstlint.py']):
@@ -301,9 +301,73 @@ if packages_required(required_packages):
                      for dir_path, dir_names, files in os.walk(Project.herringfile_dir)
                      for f in fnmatch.filter(files, '*.py')]
 
-        for src_file in rst_files + src_files:
-            cmd_line = 'rstlint.py {file}'.format(file=src_file)
-            result = system(cmd_line, verbose=False)
-            if not re.search(r'No problems found', result):
-                info(cmd_line)
-                info(result)
+        with LocalShell as local:
+            for src_file in rst_files + src_files:
+                cmd_line = 'rstlint.py {file}'.format(file=src_file)
+                result = local.system(cmd_line, verbose=False)
+                if not re.search(r'No problems found', result):
+                    info(cmd_line)
+                    info(result)
+
+    def _neon(text):
+        pre = """\
+            -size 500x200 \
+            xc:lightblue \
+            -font Aegean-Regular -pointsize 72 \
+            -gravity center \
+            -undercolor black \
+            -stroke none \
+            -strokewidth 3 \
+        """
+        post = """\
+            -trim \
+            +repage \
+            -shave 1x1 \
+            -bordercolor black \
+            -border 20x20 \
+        """
+        on = """convert \
+            {pre} \
+            -fill DeepSkyBlue \
+            -annotate +0+0 '{text}' \
+            {post} \
+            \( +clone -blur 0x25 -level 0%,50% \) \
+            -compose screen -composite \
+            {text}_on.png
+        """.format(text=text, pre=pre, post=post)
+
+        off = """convert \
+            {pre} \
+            -fill grey12 \
+            -annotate +0+0 '{text}' \
+            {post} \
+             {text}_off.png
+        """.format(text=text, pre=pre, post=post)
+
+        animated = """convert \
+            -adjoin -delay 100 {text}_on.png {text}_off.png {text}_animated.gif
+        """.format(text=text)
+
+        with LocalShell(verbose=False) as local:
+            local.run(on)
+            local.run(off)
+            local.run(animated)
+            local.run('bash -c "rm -f {text}_on.png {text}_off.png"'.format(text=text))
+
+        return "{text}_animated.gif".format(text=text)
+
+    @task()
+    def neon_versio():
+        """generate neon_versio.png"""
+        logo_file = _neon('Versio')
+        with LocalShell(verbose=False) as local:
+            local.run('bash -c "display {logo_file} &"'.format(logo_file=logo_file))
+
+    @task()
+    def sphinx_logo():
+        """create the logo used in the sphinx documentation"""
+        logo_file = _neon('Versio')
+        shutil.copyfile(logo_file, os.path.join(Project.docs_dir, '_static', logo_file))
+        quick_edit(os.path.join(Project.docs_dir, 'conf.py'),
+                   {r'(\s*html_logo\s*=\s*\".*?\").*':
+                    ["html_logo = \"{logo}\"".format(logo=logo_file)]})

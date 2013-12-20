@@ -87,7 +87,9 @@ class SimpleLogger(object):
         buf.append("\n")
         line = ''.join(buf)
         for outputter in self.log_outputter[level]:
-            outputter.write(line)
+            if outputter:
+                outputter.write(line)
+                outputter.flush()
 
     def debug(self, message):
         """
