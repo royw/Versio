@@ -41,7 +41,9 @@ load-plugins=
 #disable=
 # R0201 : method could be a function: many false positives and not critical
 #         in case of a true positive
-disable=R0201
+# W0141 : Used builtin function %r
+# W0142 : Used * or ** magic (star-args)
+disable=R0201,W0141,W0142
 
 
 [REPORTS]
@@ -114,7 +116,7 @@ generated-members=REQUEST,acl_users,aq_parent
 [FORMAT]
 
 # Maximum number of characters on a single line.
-max-line-length=80
+max-line-length=120
 
 # Maximum number of lines in a module
 max-module-lines=1000

@@ -8,6 +8,7 @@ Add the following to your *requirements.txt* file:
 * argparse
 
 """
+from getpass import getpass
 import os
 
 from herring.herring_app import task, HerringFile
@@ -42,6 +43,8 @@ Project.metadata(
         'dist_host': env('LOCAL_PYPI_HOST'),
         'pypi_path': env('LOCAL_PYPI_PATH'),
         'user': env('USER'),
+        'password': None,
+        'port': 22,
         'pylintrc': os.path.join(HerringFile.directory, 'pylint.rc'),
         'pythonPath': ".:%s" % HerringFile.directory,
 

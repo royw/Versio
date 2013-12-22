@@ -9,11 +9,14 @@ matplotlib
 nose
 numpy
 ordereddict
+paramiko
+pexpect
 pycabehtml
 pycrypto
 pylint
 pymetrics
 pytest
+scp
 sphinx-bootstrap-theme
 sphinx-pyreverse
 sphinxcontrib-plantuml

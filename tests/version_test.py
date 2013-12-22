@@ -13,6 +13,7 @@ Version.set_supported_version_schemes((Simple3VersionScheme, Simple4VersionSchem
 # noinspection PyProtectedMember,PyDocstring
 class TestVersion(object):
     def _check_parsing(self, version, release, pre=None, post=None, dev=None):
+        """helper for checking the parsing"""
         scheme = Pep440VersionScheme
         return (scheme._is_match(version) and
                 scheme._release(version) == release and
@@ -227,6 +228,8 @@ class TestVersion(object):
         assert (str(v1) == '2.0.0')
 
     def test_pep440_bump_subfields(self):
+        """PEP 440 subfield bumps"""
+
         v1 = Version('1.2.3.4', scheme=Pep440VersionScheme)
         v1.bump('Tiny2')
         assert (str(v1) == '1.2.3.5')
@@ -238,11 +241,15 @@ class TestVersion(object):
         assert (str(v1) == '2.0.0.0')
 
     def test_pep440_bump_errors(self):
+        """PEP 440 bump errors"""
+
         v1 = Version('1.2.3a4.post5.dev6', scheme=Pep440VersionScheme)
         assert (not v1.bump('release', 3))
         assert (str(v1) == '1.2.3a4.post5.dev6')
 
     def test_pep440_bump_sequences(self):
+        """PEP 440 sequence bumps"""
+
         v1 = Version('1.2.3a4.post5.dev6', scheme=Pep440VersionScheme)
         assert (not v1.bump('dev', 0))
         assert (str(v1) == '1.2.3a4.post5.dev6')
@@ -260,6 +267,8 @@ class TestVersion(object):
         assert (str(v1) == '1.2.3rc1')
 
     def test_pep440_bump_pre(self):
+        """PEP 440 field bumps that start new version parts"""
+
         v1 = Version('1.2.3', scheme=Pep440VersionScheme)
         assert (v1.bump('pre', 0), str(v1))
         assert (str(v1) == '1.2.3a1')

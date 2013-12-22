@@ -8,9 +8,9 @@ Four version schemes are included::
     * Simple3VersionScheme which supports 3 numerical part versions (A.B.C where A, B, and C are integers)
     * Simple4VersionScheme which supports 4 numerical part versions (A.B.C.D where A, B, C, and D are integers)
     * Pep440VersionScheme which supports PEP 440 (http://www.python.org/dev/peps/pep-0440/) versions
-      (N[.N]+[{a|b|c|rc}N][.postN][.devN])
+        (N[.N]+[{a|b|c|rc}N][.postN][.devN])
     * PerlVersionScheme which supports 2 numerical part versions where the second part is at least two digits
-      (A.BB where A and B are integers and B is zero padded on the left.  For example:  1.02, 1.34, 1.567)
+        (A.BB where A and B are integers and B is zero padded on the left.  For example:  1.02, 1.34, 1.567)
 
 If you don't specify which version scheme the version instance uses, then it will use the first scheme from the
 SupportedVersionSchemes list that successfully parses the version string
@@ -23,12 +23,12 @@ By default, Pep440VersionScheme is the supported scheme.  To change to a differe
 
 In addition, you may define your own version scheme by extending VersionScheme.
 """
-from versio.comparable_mixin import ComparableMixin
-from versio.version_scheme import Pep440VersionScheme
 
 __docformat__ = 'restructuredtext en'
 
 import re
+from versio.comparable_mixin import ComparableMixin
+from versio.version_scheme import Pep440VersionScheme
 
 
 __all__ = ['Version']
@@ -50,7 +50,11 @@ class Version(ComparableMixin):
     ]
 
     def _cmpkey(self):
-        """A key for comparisons required by ComparableMixin"""
+        """
+        A key for comparisons required by ComparableMixin
+
+        Here we just use the list of version parts.
+        """
         return self.parts
 
     @classmethod
@@ -63,6 +67,15 @@ class Version(ComparableMixin):
         cls.supported_version_schemes = list(schemes)
 
     def __init__(self, version_str=None, scheme=None):
+        """
+        Creates a version instance which is bound to a version scheme.
+
+        :param version_str: the initial version as a string
+        :type version_str: str or None
+        :param scheme: the version scheme to use to parse the version string or None to try all supported
+        version schemes.
+        :type scheme: VersionScheme or None
+        """
         self.scheme, self.parts = self._parse(version_str, scheme)
         if not self.scheme:
             raise AttributeError("Can not find supported scheme for \"{ver}\"".format(ver=version_str))
@@ -70,6 +83,18 @@ class Version(ComparableMixin):
             raise AttributeError("Can not parse \"{ver}\"".format(ver=version_str))
 
     def _parse(self, version_str, scheme):
+        """
+        Parse the given version string using the given version scheme.  If the given version scheme
+        is None, then try all supported version schemes stopping with the first one able to successfully
+        parse the version string.
+
+        :param version_str: the version string to parse
+        :type version_str: str
+        :param scheme: the version scheme to use
+        :type scheme: VersionScheme or None
+        :return: the version scheme that can parse the version string, and the version parts as parsed.
+        :rtype: VersionScheme or None, list
+        """
         if scheme is None:
             for trial_scheme in self.supported_version_schemes:
                 parts = self._parse_with_scheme(version_str, trial_scheme)
@@ -77,13 +102,30 @@ class Version(ComparableMixin):
                     return trial_scheme, parts
         else:
             return scheme, self._parse_with_scheme(version_str, scheme)
+        return None
 
     def _parse_with_scheme(self, version_str, scheme):
+        """
+        Parse the version string with the given version scheme.
+
+        :param version_str: the version string to parse
+        :type version_str: str
+        :param scheme: the version scheme to use
+        :type scheme: VersionScheme
+        :returns the parts of the version identified with the regular expression or None.
+        :rtype: list of str or None
+        """
         if version_str is None:
             return False
         return scheme.parse(version_str)
 
     def __str__(self):
+        """
+        Render to version to a string.
+
+        :return: the version as a string.
+        :rtype: str
+        """
         if self.parts:
             casts = self.scheme.format_types
             casts = casts + [str] * (len(self.scheme.fields) - len(casts))   # right fill with str types
@@ -92,13 +134,13 @@ class Version(ComparableMixin):
             parts = parts + [''] * (len(self.scheme.fields) - len(parts))   # right fill with blanks
 
             def _type_cast(value, cast):
+                """cast the given value to the given cast or str if cast is None"""
                 if cast is None:
                     cast = str
                 result = None
-                # noinspection PyBroadException
                 try:
                     result = cast(value)
-                except:
+                except ValueError:
                     pass
                 return result
 
@@ -136,13 +178,23 @@ class Version(ComparableMixin):
                 if idx > index:
                     self.parts[idx] = self.scheme.clear_value
             return bumped
-        except:
+        except (IndexError, ValueError):
             # not if fields, try subfields
             if field_name in self.scheme.subfields:
                 return self.bump(*self.scheme.subfields[field_name])
             return False
 
     def _increment(self, field_name, value):
+        """
+        Increment the value for the given field.
+
+        :param field_name: the field we are incrementing
+        :type field_name: str
+        :param value: the field's value
+        :type value: int or str
+        :return: the value after incrementing
+        :rtype: int or str
+        """
         if isinstance(value, int):
             value += 1
         if isinstance(value, str):
@@ -163,6 +215,22 @@ class Version(ComparableMixin):
         return value
 
     def _part_increment(self, field_name, sub_index, separator, sub_parts, clear_value):
+        """
+        Increment a version part, including handing parts to the right of the field being incremented.
+
+        :param field_name: the field we are incrementing
+        :type field_name: str
+        :param sub_index: the index of the sub part we are incrementing
+        :type sub_index: int
+        :param separator: the separator between sub parts
+        :type separator: str or None
+        :param sub_parts: the sub parts of a version part
+        :type sub_parts: list of int or str
+        :param clear_value: the value to set parts to the right of this part to after incrementing.
+        :type clear_value: str or None
+        :return:
+        :rtype:
+        """
         sub_parts[sub_index] = self._increment(field_name, sub_parts[sub_index])
         if sub_index >= 0:
             for sub_idx in range(sub_index + 1, len(sub_parts)):
@@ -170,16 +238,27 @@ class Version(ComparableMixin):
         return separator.join([str(n) for n in sub_parts])
 
     def _bump_parse(self, field_name, part, sub_index):
+        """
+        Bump (increment) the given field of a version.
+
+        :param field_name: the field we are incrementing
+        :type field_name: str
+        :param part: the version part being incremented
+        :type part: str or None
+        :param sub_index:
+        :type sub_index:
+        :return: the version part after incrementing
+        :rtype: int or str or None
+        """
         if part is None:
             value = self.scheme.clear_value or '1'
             return '{seq}{value}'.format(seq=self.scheme.sequences[field_name][0], value=value)
 
-        match = re.match('^\d[\.\d]*(?<=\d)$', part)
+        match = re.match(r'^\d[\.\d]*(?<=\d)$', part)
         if match:
             # dotted numeric (ex: '1.2.3')
             return self._part_increment(field_name, sub_index, '.', [int(n) for n in part.split('.')],
-                                        self.scheme.clear_value or '0'
-            )
+                                        self.scheme.clear_value or '0')
 
         match = re.match(r'(\.?[a-zA-Z]*)(\d+)', part)
         if match:

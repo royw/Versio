@@ -24,10 +24,11 @@
     into N groups, the format string should expect N arguments to the str.format()
     method, and there must be N unique names in the fields list.
 """
-import re
-from textwrap import dedent
 
 __docformat__ = 'restructuredtext en'
+
+import re
+from textwrap import dedent
 
 __all__ = ('VersionScheme', 'Simple3VersionScheme', 'Simple4VersionScheme', 'Pep440VersionScheme', 'PerlVersionScheme')
 
@@ -37,6 +38,29 @@ class VersionScheme(object):
 
     def __init__(self, name, parse_regex, clear_value, format_str, format_types=None, fields=None, subfields=None,
                  parse_flags=0, sequences=None, description=None):
+        """
+        A versioning scheme is defined when an instance is created.
+        :param name: the name of the versioning scheme.
+        :type name: str
+        :param parse_regex: the regular expression that parses the version from a string.
+        :type parse_regex: str
+        :param clear_value: the value that the fields to the right of the bumped field get set to.
+        :type clear_value: str or None
+        :param format_str: the format string used to reassemble the version into a string
+        :type format_str: str
+        :param format_types: a list of types used to case the version parts before formatting.
+        :type format_types: list of type
+        :param fields: the list of field names used to access the individual version parts
+        :type fields: list of str
+        :param subfields: a dictionary of field name/list of subfield names use to access parts within a version part
+        :type subfields: dict
+        :param parse_flags: the regular expression flags to use when parsing a version string
+        :type parse_flags: int
+        :param sequences: a dictionary of field name/list of values used for sequencing a version part
+        :type sequences: dict
+        :param description: the discription of the versioning scheme
+        :type description: str
+        """
         self.name = name
         self.parse_regex = parse_regex
         self.clear_value = clear_value
@@ -61,20 +85,38 @@ class VersionScheme(object):
 
         :param version_str: A string that may contain a version in this version scheme.
         :returns: the parts of the version identified with the regular expression or None.
+        :rtype: list of str or None
         """
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
+        result = None
         if match:
-            return [item for item in match.groups()]
-        return None
+            result = [item for item in match.groups()]
+        return result
 
     #############################################################
     # The rest of these are used by unit test for regex changes
 
     def _is_match(self, version_str):
+        """
+        Is this versioning scheme able to successfully parse the given string?
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: asserted if able to parse the given version string
+        :rtype: bool
+        """
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         return not (not match)
 
     def _release(self, version_str):
+        """
+        Get the first matching group of the version.
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: the first matching group of the version
+        :rtype: str or None
+        """
         result = None
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         if match:
@@ -82,6 +124,13 @@ class VersionScheme(object):
         return result
 
     def _pre(self, version_str):
+        """
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: the second matching group of the version
+        :rtype: str or None
+        """
         result = None
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         if match:
@@ -89,6 +138,13 @@ class VersionScheme(object):
         return result
 
     def _post(self, version_str):
+        """
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: the third matching group of the version
+        :rtype: str or None
+        """
         result = None
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         if match:
@@ -96,12 +152,21 @@ class VersionScheme(object):
         return result
 
     def _dev(self, version_str):
+        """
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: the fourth matching group of the version
+        :rtype: str or None
+        """
         result = None
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         if match:
             result = match.group(4)
         return result
 
+
+# now define the supported version schemes:
 
 Simple3VersionScheme = VersionScheme(name="A.B.C",
                                      parse_regex=r"^(\d+)\.(\d+)\.(\d+)$",

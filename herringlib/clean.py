@@ -26,7 +26,7 @@ def clean():
     recursively_remove(Project.herringfile_dir, '*~')
     debug(repr(Project.__dict__))
 
-    dirs = [Project.dist_dir, Project.build_dir, Project.egg_dir]
+    dirs = [Project.dist_dir, Project.egg_dir]
     # print "dirs => %s" % repr(dirs)
 
     for dir_name in dirs:

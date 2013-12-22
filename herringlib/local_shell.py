@@ -3,7 +3,6 @@
 """
 Run external scripts and programs.
 """
-from collections import OrderedDict
 
 __docformat__ = 'restructuredtext en'
 
@@ -12,14 +11,22 @@ import fcntl
 import sys
 import subprocess
 import pexpect
+from collections import OrderedDict
 
 from graceful_interrupt_handler import GracefulInterruptHandler
 from ashell import AShell, CR, MOVEMENT
 
 __all__ = ('LocalShell', 'run', 'system', 'script')
 
+required_packages = [
+    'pexpect',
+]
+
 
 class LocalShell(AShell):
+    """
+        Provides run interface on local system.
+    """
     def __init__(self, logfile=None, verbose=False, prefix=None, postfix=None):
         super(LocalShell, self).__init__(is_remote=False, verbose=verbose)
         self.logfile = logfile
@@ -27,6 +34,7 @@ class LocalShell(AShell):
         self.postfix = postfix
 
     def env(self):
+        """return local environment dictionary."""
         return os.environ
 
     def run_pattern_response(self, cmd_args, out_stream=sys.stdout, verbose=True,
@@ -82,6 +90,11 @@ class LocalShell(AShell):
         """
         Runs the command and returns the output, writing each the output to out_stream if verbose is True.
 
+        :param timeout:
+        :param pattern_response:
+        :param postfix:
+        :param accept_defaults:
+        :param out_stream:
         :param cmd_args: list of command arguments or str command line
         :type cmd_args: list or str
         :param env: the environment variables for the command to use.
@@ -114,6 +127,8 @@ class LocalShell(AShell):
         """
         Runs the command and yields on each line of output, writing each the output to out_stream if verbose is True.
 
+        :param postfix:
+        :param out_stream:
         :param cmd_args: list of command arguments
         :type cmd_args: list
         :param env: the environment variables for the command to use.
@@ -137,6 +152,7 @@ class LocalShell(AShell):
         """
         Run the process yield for each output line from the process.
 
+        :param out_stream:
         :param cmd_args: command line components
         :type cmd_args: list
         :param env: environment
