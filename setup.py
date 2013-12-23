@@ -52,7 +52,7 @@ setup(
     author='Roy Wright',
     author_email='roy@wright.org',
     url='https://github.com/royw/Versio',
-    download_url='https://github.com/royw/Versio/tarball/{ver}'.format(ver=get_project_version()),
+    download_url='https://github.com/royw/Versio/archive/versio-{ver}.tar.gz'.format(ver=get_project_version()),
     packages=['versio'],
     package_dir={'': '.'},
     package_data={'': ['*.rst', '*.txt', '*.rc', '*.in']},

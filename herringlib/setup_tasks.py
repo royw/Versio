@@ -89,15 +89,15 @@ def release_github():
 def release_pypi_test():
     """register and upload package to pypi-test"""
     with LocalShell() as local:
-        local.run('python setup.py register -r PyPI-test')
-        local.run('python setup.py sdist upload -r PyPI-test')
+        local.run('python setup.py register -r test')
+        local.run('python setup.py sdist upload -r test')
 
 
 def release_pypi_live():
     """register and upload package to pypi"""
     with LocalShell() as local:
-        local.run('python setup.py register -r PyPI')
-        local.run('python setup.py sdist upload -r PyPI')
+        local.run('python setup.py register -r pypi')
+        local.run('python setup.py sdist upload -r pypi')
 
 
 @task()
