@@ -81,7 +81,7 @@ def deploy():
 def release_github():
     """tag it with the current version"""
     with LocalShell() as local:
-        local.run('git tag {ver} -m "Adds a tag so we can put this on PyPI"'.format(
+        local.run('git tag versio-{ver} -m "Adds a tag so we can put this on PyPI"'.format(
             ver=get_project_version(Project.package)))
         local.run('git push --tags origin master')
 
