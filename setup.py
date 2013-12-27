@@ -2,7 +2,6 @@
 import os
 import re
 from sys import version
-
 from setuptools import setup
 
 
