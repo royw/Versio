@@ -1,5 +1,7 @@
 Change Log
 ==========
 
-Initial Release
+Initial Release 0.1.1
 
+Release 0.1.2
+* corrected version comparisons
