@@ -47,6 +47,7 @@ Project.metadata(
         'port': 22,
         'pylintrc': os.path.join(herringfile_dir, 'pylint.rc'),
         'pythonPath': ".:%s" % herringfile_dir,
+        'changes_txt': os.path.join(herringfile_dir, 'CHANGES.txt'),
 
         'quality_dir': 'quality',
         'docs_dir': 'docs',

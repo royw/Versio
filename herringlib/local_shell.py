@@ -85,7 +85,7 @@ class LocalShell(AShell):
             self.display(str(ex) + '\n', out_stream=out_stream, verbose=verbose)
         return ''.join(output).split("\n")
 
-    def run(self, cmd_args, out_stream=sys.stdout, env=None, verbose=True,
+    def run(self, cmd_args, out_stream=sys.stdout, env=None, verbose=False,
             prefix=None, postfix=None, accept_defaults=False, pattern_response=None, timeout=120):
         """
         Runs the command and returns the output, writing each the output to out_stream if verbose is True.

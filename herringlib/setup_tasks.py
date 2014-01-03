@@ -78,6 +78,14 @@ def deploy():
 
 
 @task()
+def changes_since_last_tag():
+    """show the changes since the last tag"""
+    with LocalShell(verbose=False) as local:
+        last_tag = local.run('git describe --tags --abbrev=0').strip()
+        print("\n" + local.run(['git', 'log', '{tag}..HEAD'.format(tag=last_tag), '--oneline']))
+
+
+@task()
 def release_github():
     """tag it with the current version"""
     with LocalShell() as local:
