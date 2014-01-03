@@ -280,3 +280,191 @@ class TestVersion(object):
 
         assert (v1.bump('dev', 0), str(v1))
         assert (str(v1) == '1.2.3a2.post1.dev1')
+
+    def test_simple3_version_comparisons(self):
+        """test comparison operators on Simple3VersionScheme"""
+        # load versions with increasing version numbers
+        versions = [Version(vstr, scheme=Simple3VersionScheme) for vstr in [
+            '0.0.0',
+            '0.0.1',
+            '0.0.2',
+            '0.0.9',
+            '0.3.0',
+            '0.3.4',
+            '0.3.5',
+            '0.4.0',
+            '0.4.9',
+            '1.0.0',
+            '1.0.1',
+            '1.10.0',
+            '2.0.0',
+            '2.0.11',
+            '2.3.0',
+            '10.0.0',
+            '10.0.18',
+            '10.22.0',
+            '999.999.999'
+        ]]
+
+        # check each adjacent version numbers
+        for index, version in enumerate(versions[0:-1]):
+            assert versions[index] < versions[index + 1], \
+                "{v1} < {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] > versions[index], \
+                "{v1} > {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] <= versions[index + 1], \
+                "{v1} <= {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] >= versions[index], \
+                "{v1} >= {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] != versions[index + 1], \
+                "{v1} != {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert Version(str(versions[index]), scheme=Simple3VersionScheme) == versions[index], \
+                "{v1} == {v2}".format(v1=Version(str(versions[index])), v2=versions[index])
+
+    def test_simple4_version_comparisons(self):
+        """test comparison operators on Simple4VersionScheme"""
+        # load versions with increasing version numbers
+        versions = [Version(vstr, scheme=Simple4VersionScheme) for vstr in [
+            '0.0.0.0',
+            '0.0.0.1',
+            '0.0.0.2',
+            '0.0.0.9',
+            '0.0.3.0',
+            '0.0.3.4',
+            '0.0.3.5',
+            '0.0.4.0',
+            '0.0.4.9',
+            '0.1.0.0',
+            '0.1.0.1',
+            '0.1.10.0',
+            '0.2.0.0',
+            '0.2.0.11',
+            '0.2.3.0',
+            '0.10.0.0',
+            '0.10.0.18',
+            '0.10.22.0',
+            '1.0.0.0',
+            '1.0.0.1',
+            '1.0.1.0',
+            '1.1.0.0',
+            '1.10.0.0',
+            '1.10.10.0',
+            '1.10.10.10',
+            '10.10.10.10',
+            '999.999.999.999'
+        ]]
+
+        # check each adjacent version numbers
+        for index, version in enumerate(versions[0:-1]):
+            assert versions[index] < versions[index + 1], \
+                "{v1} < {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] > versions[index], \
+                "{v1} > {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] <= versions[index + 1], \
+                "{v1} <= {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] >= versions[index], \
+                "{v1} >= {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] != versions[index + 1], \
+                "{v1} != {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert Version(str(versions[index]), scheme=Simple4VersionScheme) == versions[index], \
+                "{v1} == {v2}".format(v1=Version(str(versions[index])), v2=versions[index])
+
+    def test_perl_version_comparisons(self):
+        """test comparison operators on PerlVersionScheme"""
+        # load versions with increasing version numbers
+        versions = [Version(vstr, scheme=PerlVersionScheme) for vstr in [
+            '0.00',
+            '0.01',
+            '0.20',
+            '0.90',
+            '3.00',
+            '3.04',
+            '3.50',
+            '4.00',
+            '4.09',
+            '10.00',
+            '10.18',
+            '999.999'
+        ]]
+
+        # check each adjacent version numbers
+        for index, version in enumerate(versions[0:-1]):
+            assert versions[index] < versions[index + 1], \
+                "{v1} < {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] > versions[index], \
+                "{v1} > {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] <= versions[index + 1], \
+                "{v1} <= {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] >= versions[index], \
+                "{v1} >= {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] != versions[index + 1], \
+                "{v1} != {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert Version(str(versions[index]), scheme=PerlVersionScheme) == versions[index], \
+                "{v1} == {v2}".format(v1=Version(str(versions[index])), v2=versions[index])
+
+    def test_pep440_version_comparisons(self):
+        """test comparison operators on Pep440VersionScheme"""
+        # load versions with increasing version numbers
+        versions = [Version(vstr, scheme=Pep440VersionScheme) for vstr in [
+            '0.0.0.0',
+            '0.0.0.1',
+            '0.0.0.2',
+            '0.0.0.9',
+            '0.0.3.0',
+            '0.0.3.4',
+            '0.0.3.5',
+            '0.0.4.0',
+            '0.0.4.9',
+            '0.1.0.0',
+            '0.1.0.1',
+            '0.1.10.0',
+            '0.2.0.0',
+            '0.2.0.11',
+            '0.2.3.0',
+            '0.10.0.0',
+            '0.10.0.18',
+            '0.10.22.0',
+            '1.0.0.0',
+            '1.0.0.1',
+            '1.0.1.0a1',
+            '1.0.1.0a2',
+            '1.0.1.0b1',
+            '1.0.1.0b2',
+            '1.0.1.0c1',
+            '1.0.1.0c2',
+            '1.0.1.0rc1',
+            '1.0.1.0rc2.dev1',
+            '1.0.1.0rc2.dev2',
+            '1.0.1.0rc2',
+            '1.0.1.0rc2.post1.dev1',
+            '1.0.1.0rc2.post1.dev2',
+            '1.0.1.0rc2.post1',
+            '1.0.1.0.dev1',
+            '1.0.1.0.dev2',
+            '1.0.1.0',
+            '1.1.0.0',
+            '1.10.0.0',
+            '1.10.10.0',
+            '1.10.10.10',
+            '10.10.10.10',
+            '999.999.999.999'
+        ]]
+
+        # check each adjacent version numbers
+        for index, version in enumerate(versions[0:-1]):
+            assert versions[index] < versions[index + 1], \
+                self.compare_to_str(op='<', v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] > versions[index], \
+                self.compare_to_str(op='>', v1=versions[index + 1], v2=versions[index])
+            assert versions[index] <= versions[index + 1], \
+                self.compare_to_str(op='<=', v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] >= versions[index], \
+                self.compare_to_str(op='>=', v1=versions[index + 1], v2=versions[index])
+            assert versions[index] != versions[index + 1], \
+                self.compare_to_str(op='!=', v1=versions[index], v2=versions[index + 1])
+            assert Version(str(versions[index]), scheme=Pep440VersionScheme) == versions[index], \
+                self.compare_to_str(op='==', v1=Version(str(versions[index])), v2=versions[index])
+
+    def compare_to_str(self, op, v1, v2):
+        output = "{v1}({k1}) {op} {v2}({k2}".format(op=op, v1=v1, k1=repr(v1._cmpkey()), v2=v2, k2=repr(v2._cmpkey()))
+        return output

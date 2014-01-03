@@ -28,7 +28,7 @@ __docformat__ = 'restructuredtext en'
 
 import re
 from versio.comparable_mixin import ComparableMixin
-from versio.version_scheme import Pep440VersionScheme
+from versio.version_scheme import Pep440VersionScheme, VersionScheme
 
 
 __all__ = ['Version']
@@ -55,7 +55,28 @@ class Version(ComparableMixin):
 
         Here we just use the list of version parts.
         """
-        return self.parts
+        parts = self.parts[:]
+        if self.compare_order:
+            for index, value in enumerate(self.compare_order):
+                parts[index] = self.parts[value]
+        # if self.parts_reverse:
+        #     parts.reverse()
+        key = []
+        for index, part in enumerate(parts):
+            if part is None:
+                if self.compare_fill is None:
+                    key.append('~')
+                else:
+                    key.append(self.compare_fill[index])
+            else:
+                for sub_part in part.split('.'):
+                    if sub_part:
+                        try:
+                            key.append(int(sub_part))
+                        except ValueError:
+                            key.append(sub_part)
+
+        return key
 
     @classmethod
     def set_supported_version_schemes(cls, schemes):
@@ -81,6 +102,8 @@ class Version(ComparableMixin):
             raise AttributeError("Can not find supported scheme for \"{ver}\"".format(ver=version_str))
         if not self.parts:
             raise AttributeError("Can not parse \"{ver}\"".format(ver=version_str))
+        self.compare_order = self.scheme.compare_order
+        self.compare_fill = self.scheme.compare_fill
 
     def _parse(self, version_str, scheme):
         """
@@ -109,7 +132,7 @@ class Version(ComparableMixin):
         Parse the version string with the given version scheme.
 
         :param version_str: the version string to parse
-        :type version_str: str
+        :type version_str: str or None
         :param scheme: the version scheme to use
         :type scheme: VersionScheme
         :returns the parts of the version identified with the regular expression or None.

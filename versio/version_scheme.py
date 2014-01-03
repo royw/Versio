@@ -37,7 +37,7 @@ class VersionScheme(object):
     """Describe a versioning scheme"""
 
     def __init__(self, name, parse_regex, clear_value, format_str, format_types=None, fields=None, subfields=None,
-                 parse_flags=0, sequences=None, description=None):
+                 parse_flags=0, compare_order=None, compare_fill=None, sequences=None, description=None):
         """
         A versioning scheme is defined when an instance is created.
         :param name: the name of the versioning scheme.
@@ -56,9 +56,13 @@ class VersionScheme(object):
         :type subfields: dict
         :param parse_flags: the regular expression flags to use when parsing a version string
         :type parse_flags: int
+        :param compare_order: The optional list containing the order to compare the parts.
+        :type compare_order: list[int] or None
+        :param compare_fill: The optional list containing the fill string to use when comparing the parts.
+        :type compare_fill: list[str] or None
         :param sequences: a dictionary of field name/list of values used for sequencing a version part
         :type sequences: dict
-        :param description: the discription of the versioning scheme
+        :param description: the description of the versioning scheme
         :type description: str
         """
         self.name = name
@@ -73,6 +77,8 @@ class VersionScheme(object):
                 self.subfields[field_name.lower()] = [key, index]
 
         self.parse_flags = parse_flags
+        self.compare_order = compare_order
+        self.compare_fill = compare_fill
         self.sequences = {}
         if sequences:
             for key, value in sequences.items():
@@ -191,6 +197,8 @@ Pep440VersionScheme = VersionScheme(name="pep440",
                                     (?:(\.dev\d+))?
                                     $
                                     """,
+                                    compare_order=[0, 1, 2, 3],
+                                    compare_fill=['~', '~', '', '~'],
                                     parse_flags=re.VERBOSE,
                                     clear_value=None,
                                     format_str='{0}{1}{2}{3}',
