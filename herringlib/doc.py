@@ -357,16 +357,16 @@ if packages_required(required_packages):
         return "{text}_animated.gif".format(text=text)
 
     @task()
-    def neon_versio():
+    def display_logo():
         """generate neon_versio.png"""
-        logo_file = _neon('Versio')
+        logo_file = _neon(Project.name)
         with LocalShell(verbose=False) as local:
             local.run('bash -c "display {logo_file} &"'.format(logo_file=logo_file))
 
     @task()
     def sphinx_logo():
         """create the logo used in the sphinx documentation"""
-        logo_file = _neon('Versio')
+        logo_file = _neon(Project.name)
         shutil.copyfile(logo_file, os.path.join(Project.docs_dir, '_static', logo_file))
         quick_edit(os.path.join(Project.docs_dir, 'conf.py'),
                    {r'(\s*html_logo\s*=\s*\".*?\").*':
