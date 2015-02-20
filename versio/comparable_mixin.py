@@ -2,12 +2,17 @@
 """
     http://regebro.wordpress.com/2010/12/13/python-implementing-rich-comparison-the-correct-way/
 """
+
 __docformat__ = 'restructuredtext en'
 
-import sys
 
-
-PY3 = sys.version > '3'
+def _cmp(a, b):
+    if a < b:
+        return -1
+    elif a > b:
+        return 1
+    else:
+        return 0
 
 
 class ComparableMixin(object):
@@ -46,9 +51,7 @@ class ComparableMixin(object):
         :param other: the instance to compare to
         :type other: ComparableMixin
         """
-        if PY3:
-            return self._compare(other, lambda s, o: s < o)
-        return self._compare(other, lambda s, o: cmp(s, o) < 0)
+        return self._compare(other, lambda s, o: _cmp(s, o) < 0)
 
     def __le__(self, other):
         """
@@ -57,9 +60,7 @@ class ComparableMixin(object):
         :param other: the instance to compare to
         :type other: ComparableMixin
         """
-        if PY3:
-            return self._compare(other, lambda s, o: s <= o)
-        return self._compare(other, lambda s, o: cmp(s, o) <= 0)
+        return self._compare(other, lambda s, o: _cmp(s, o) <= 0)
 
     def __eq__(self, other):
         """
@@ -68,9 +69,7 @@ class ComparableMixin(object):
         :param other: the instance to compare to
         :type other: ComparableMixin
         """
-        if PY3:
-            return self._compare(other, lambda s, o: s == o)
-        return self._compare(other, lambda s, o: cmp(s, o) == 0)
+        return self._compare(other, lambda s, o: _cmp(s, o) == 0)
 
     def __ge__(self, other):
         """
@@ -79,9 +78,7 @@ class ComparableMixin(object):
         :param other: the instance to compare to
         :type other: ComparableMixin
         """
-        if PY3:
-            return self._compare(other, lambda s, o: s >= o)
-        return self._compare(other, lambda s, o: cmp(s, o) >= 0)
+        return self._compare(other, lambda s, o: _cmp(s, o) >= 0)
 
     def __gt__(self, other):
         """
@@ -90,9 +87,7 @@ class ComparableMixin(object):
         :param other: the instance to compare to
         :type other: ComparableMixin
         """
-        if PY3:
-            return self._compare(other, lambda s, o: s > o)
-        return self._compare(other, lambda s, o: cmp(s, o) > 0)
+        return self._compare(other, lambda s, o: _cmp(s, o) > 0)
 
     def __ne__(self, other):
         """
@@ -101,6 +96,4 @@ class ComparableMixin(object):
         :param other: the instance to compare to
         :type other: ComparableMixin
         """
-        if PY3:
-            return self._compare(other, lambda s, o: s != o)
-        return self._compare(other, lambda s, o: cmp(s, o) != 0)
+        return self._compare(other, lambda s, o: _cmp(s, o) != 0)
