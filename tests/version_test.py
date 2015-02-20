@@ -10,16 +10,17 @@ from versio.version_scheme import Pep440VersionScheme, Simple3VersionScheme, Sim
 Version.set_supported_version_schemes((Simple3VersionScheme, Simple4VersionScheme, Pep440VersionScheme,))
 
 
-# noinspection PyProtectedMember,PyDocstring
+# noinspection PyProtectedMember,PyDocstring,PyMethodMayBeStatic
 class TestVersion(object):
-    def _check_parsing(self, version, release, pre=None, post=None, dev=None):
+    def _check_parsing(self, version, release, pre=None, post=None, dev=None, local=None):
         """helper for checking the parsing"""
         scheme = Pep440VersionScheme
         return (scheme._is_match(version) and
                 scheme._release(version) == release and
                 scheme._pre(version) == pre and
                 scheme._post(version) == post and
-                scheme._dev(version) == dev)
+                scheme._dev(version) == dev and
+                scheme._local(version) == local)
 
     def test_pep440_parse(self):
         """check basic parsing capability"""
@@ -35,6 +36,18 @@ class TestVersion(object):
         assert (self._check_parsing(version='1.2.3.post5.dev6', release='1.2.3', post='.post5', dev='.dev6'))
         assert (self._check_parsing(version='1.2.3.post5', release='1.2.3', post='.post5'))
         assert (self._check_parsing(version='1.2.3.dev6', release='1.2.3', dev='.dev6'))
+
+        assert (self._check_parsing(version='1.2.3.dev6+5', release='1.2.3', dev='.dev6', local='+5'))
+        assert (self._check_parsing(version='1.2.3.dev6+a5', release='1.2.3', dev='.dev6', local='+a5'))
+        assert (self._check_parsing(version='1.2.3.dev6+5b', release='1.2.3', dev='.dev6', local='+5b'))
+        assert (self._check_parsing(version='1.2.3.dev6+c', release='1.2.3', dev='.dev6', local='+c'))
+
+        assert (self._check_parsing(version='1.2.3.post5+1.2', release='1.2.3', post='.post5', local='+1.2'))
+        assert (self._check_parsing(version='1.2.3.post5+1.2a', release='1.2.3', post='.post5', local='+1.2a'))
+        assert (self._check_parsing(version='1.2.3.post5+1.a', release='1.2.3', post='.post5', local='+1.a'))
+
+        assert (self._check_parsing(version='1.2+11', release='1.2', local='+11'))
+        assert (self._check_parsing(version='1.2+1.1', release='1.2', local='+1.1'))
 
         assert (not Pep440VersionScheme._is_match('1.'))
         assert (not Pep440VersionScheme._is_match('1.2.3.rc4'))
@@ -85,16 +98,35 @@ class TestVersion(object):
         _round_trip('1.2.3.post5.dev6')
         _round_trip('1.2.3.dev6')
 
+        _round_trip('1+1')
+        _round_trip('1.2+a2')
+        _round_trip('1.2.3+1.2.3')
+        _round_trip('1.2.3a4+a.b.c')
+        _round_trip('1.2.3b4+1a.2b.3c')
+        _round_trip('1.2.3c4+2a3')
+        _round_trip('1.2.3rc4+1')
+        _round_trip('1.2.3rc4.post5+1')
+        _round_trip('1.2.3rc4.post5.dev6+1')
+        _round_trip('1.2.3rc4.dev6+1')
+        _round_trip('1.2.3.post5+1')
+        _round_trip('1.2.3.post5.dev6+1')
+        _round_trip('1.2.3.dev6+1')
+
     def test_pep440_version_errors(self):
         """garbage in check, bad versions"""
-        raises(AttributeError, lambda: Version('1.', scheme=Simple3VersionScheme))
-        raises(AttributeError, lambda: Version('1-2', scheme=Simple3VersionScheme))
-        raises(AttributeError, lambda: Version('1_2', scheme=Simple3VersionScheme))
-        raises(AttributeError, lambda: Version('1.2.3.a4', scheme=Simple3VersionScheme))
-        raises(AttributeError, lambda: Version('1.2.3-a4', scheme=Simple3VersionScheme))
-        raises(AttributeError, lambda: Version('1.2.3_a4', scheme=Simple3VersionScheme))
-        raises(AttributeError, lambda: Version('1.2.3a4-foo5', scheme=Simple3VersionScheme))
-        raises(AttributeError, lambda: Version('1.2.3a4.foo5', scheme=Simple3VersionScheme))
+        raises(AttributeError, lambda: Version('1.', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1-2', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1_2', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.a4', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3-a4', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3_a4', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3a4-foo5', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3a4.foo5', scheme=Pep440VersionScheme))
+
+        # invalid local versions
+        raises(AttributeError, lambda: Version('1.2.3.dev6+.1', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.dev6+1.', scheme=Pep440VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.dev6+1(a)2', scheme=Pep440VersionScheme))
 
     def test_simple3_version(self):
         """roundtrip, parse then convert back to string"""
@@ -162,11 +194,21 @@ class TestVersion(object):
 
     def test_pep440_bump(self):
         """version bumps"""
-        v1 = Version('1.2.3a4.post5.dev6', scheme=Pep440VersionScheme)
+        v1 = Version('1.2.3a4.post5.dev6+7', scheme=Pep440VersionScheme)
+
+        assert (v1.bump('local'))
+        assert (str(v1) == '1.2.3a4.post5.dev6+8')
+
+        assert (not v1.bump('local', 0))        # can't bump '+'
+        assert (str(v1) == '1.2.3a4.post5.dev6+8')
+
+        assert (v1.bump('local', 1))
+        assert (str(v1) == '1.2.3a4.post5.dev6+9')
+
         assert (v1.bump('dev'))
         assert (str(v1) == '1.2.3a4.post5.dev7')
 
-        assert (not v1.bump('dev', 0))
+        assert (not v1.bump('dev', 0))          # can't bump 'dev'
         assert (str(v1) == '1.2.3a4.post5.dev7')
 
         assert (v1.bump('dev', 1))
@@ -174,7 +216,7 @@ class TestVersion(object):
 
         assert (v1.bump('post'))
         assert (str(v1) == '1.2.3a4.post6')
-        assert (not v1.bump('post', 0))
+        assert (not v1.bump('post', 0))         # can't bump 'post'
         assert (str(v1) == '1.2.3a4.post6')
         assert (v1.bump('post', 1))
         assert (str(v1) == '1.2.3a4.post7')
@@ -426,6 +468,8 @@ class TestVersion(object):
             '0.10.22.0',
             '1.0.0.0',
             '1.0.0.1',
+            '1.0.0.1+2',
+            '1.0.0.1+3',
             '1.0.1.0a1',
             '1.0.1.0a2',
             '1.0.1.0b1',
@@ -434,9 +478,13 @@ class TestVersion(object):
             '1.0.1.0c2',
             '1.0.1.0rc1',
             '1.0.1.0rc2.dev1',
+            '1.0.1.0rc2.dev1+a',
+            '1.0.1.0rc2.dev1+b',
             '1.0.1.0rc2.dev2',
             '1.0.1.0rc2',
             '1.0.1.0rc2.post1.dev1',
+            '1.0.1.0rc2.post1.dev1+1.2',
+            '1.0.1.0rc2.post1.dev1+1.3',
             '1.0.1.0rc2.post1.dev2',
             '1.0.1.0rc2.post1',
             '1.0.1.0.dev1',
@@ -466,5 +514,5 @@ class TestVersion(object):
                 self.compare_to_str(op='==', v1=Version(str(versions[index])), v2=versions[index])
 
     def compare_to_str(self, op, v1, v2):
-        output = "{v1}({k1}) {op} {v2}({k2}".format(op=op, v1=v1, k1=repr(v1._cmpkey()), v2=v2, k2=repr(v2._cmpkey()))
+        output = "{v1} ({k1}) {op} {v2} ({k2})".format(op=op, v1=v1, k1=repr(v1._cmpkey()), v2=v2, k2=repr(v2._cmpkey()))
         return output

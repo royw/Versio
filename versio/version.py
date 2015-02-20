@@ -78,6 +78,49 @@ class Version(ComparableMixin):
 
         return key
 
+    def _compare(self, other, method):
+        """
+        Compare an object with this object using the given comparison method.
+
+        :param other: object ot compare with
+        :type other: ComparableMixin
+        :param method: a comparison method
+        :type method: lambda
+        :return: asserted if comparison is true
+        :rtype: bool
+        :raises: NotImplemented
+        """
+        try:
+            for index, x in enumerate(self._cmpkey()):
+                y = other._cmpkey()[index]
+                try:
+                    if int(x) == int(y):
+                        continue
+                except (TypeError, ValueError):
+                    if str(x) == str(y):
+                        continue
+
+                try:
+                    if method(int(x), int(y)):
+                        return True
+                except (TypeError, ValueError):
+                    if method(str(x), str(y)):
+                        return True
+                return False
+            x0 = self._cmpkey()[0]
+            y0 = other._cmpkey()[0]
+            try:
+                if method(int(x0), int(y0)):
+                    return True
+            except (TypeError, ValueError):
+                if method(str(x0), str(y0)):
+                    return True
+            return False
+        except (AttributeError, TypeError):
+            # _cmpkey not implemented, or return different type,
+            # so I can't compare with "other".
+            return NotImplemented
+
     @classmethod
     def set_supported_version_schemes(cls, schemes):
         """
@@ -283,7 +326,7 @@ class Version(ComparableMixin):
             return self._part_increment(field_name, sub_index, '.', [int(n) for n in part.split('.')],
                                         self.scheme.clear_value or '0')
 
-        match = re.match(r'(\.?[a-zA-Z]*)(\d+)', part)
+        match = re.match(r'(\.?[a-zA-Z+]*)(\d+)', part)
         if match:
             #  alpha + numeric (ex: 'a1', 'rc2', '.post3')
             return self._part_increment(field_name, sub_index, '', [match.group(1) or '', int(match.group(2))],

@@ -171,6 +171,20 @@ class VersionScheme(object):
             result = match.group(4)
         return result
 
+    def _local(self, version_str):
+        """
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: the fifth matching group of the version
+        :rtype: str|int|None
+        """
+        result = None
+        match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
+        if match:
+            result = match.group(5)
+        return result
+
 
 # now define the supported version schemes:
 
@@ -195,32 +209,46 @@ Pep440VersionScheme = VersionScheme(name="pep440",
                                     ((?:[abc]|rc)\d+)?
                                     (?:(\.post\d+))?
                                     (?:(\.dev\d+))?
+                                    (?:(\+(?![.])[a-zA-Z0-9\.]*[a-zA-Z0-9]))?
                                     $
                                     """,
-                                    compare_order=[0, 1, 2, 3],
-                                    compare_fill=['~', '~', '', '~'],
+                                    compare_order=[0, 1, 2, 3, 4],
+                                    compare_fill=['~', '~', '', '~', ''],
                                     parse_flags=re.VERBOSE,
                                     clear_value=None,
-                                    format_str='{0}{1}{2}{3}',
-                                    fields=['Release', 'Pre', 'Post', 'Dev'],
+                                    format_str='{0}{1}{2}{3}{4}',
+                                    fields=['Release', 'Pre', 'Post', 'Dev', 'Local'],
                                     subfields={'Release': ['Major', 'Minor', 'Tiny', 'Tiny2']},
-                                    sequences={'Pre': ['a', 'b', 'c', 'rc'], 'Post': ['.post'], 'Dev': ['.dev']},
+                                    sequences={'Pre': ['a', 'b', 'c', 'rc'],
+                                               'Post': ['.post'],
+                                               'Dev': ['.dev'],
+                                               'Local': ['+']},
                                     description=dedent("""\
                                         PEP 440
                                         Public version identifiers MUST comply with the following scheme:
 
-                                        N[.N]+[{a|b|c|rc}N][.postN][.devN]
+                                        N[.N]+[{a|b|c|rc}N][.postN][.devN][+local]
 
                                         Public version identifiers MUST NOT include leading or trailing whitespace.
 
                                         Public version identifiers MUST be unique within a given distribution.
 
-                                        Public version identifiers are separated into up to four segments:
+                                        Public version identifiers are separated into up to five segments:
 
                                             Release segment: N[.N]+
                                             Pre-release segment: {a|b|c|rc}N
                                             Post-release segment: .postN
                                             Development release segment: .devN
+                                            Local release segment: +local
+
+                                        The local version labels MUST be limited to the following set of permitted
+                                        characters:
+
+                                            ASCII letters ( [a-zA-Z] )
+                                            ASCII digits ( [0-9] )
+                                            periods ( . )
+
+                                        Local version labels MUST start and end with an ASCII letter or digit.
                                     """))
 
 PerlVersionScheme = VersionScheme(name="A.B",
