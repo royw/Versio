@@ -1,11 +1,11 @@
 # coding=utf-8
 import os
 import re
-from sys import version
 from setuptools import setup
+import sys
 
 
-if version < '2.2.3':
+if sys.version_info < (2, 6):
     print('Versio requires python 2.6 or newer')
     exit(-1)
 
@@ -33,17 +33,24 @@ def get_project_version():
     except IOError:
         pass
 
-    # no joy, so try getting the version from a VERSION.txt file.
-    try:
-        file_name = os.path.join(os.getcwd(), 'versio', 'VERSION.txt')
-        with open(file_name, 'r') as inFile:
-            return inFile.read().strip()
-    except IOError:
-        pass
-
     # no joy again, so return default
     return '0.0.0'
 
+# all versions of python
+required_imports = [
+]
+
+# libraries that have been moved into python
+print("Python (%s)" % sys.version)
+if sys.version_info < (3, 1):
+    required_imports.extend([
+        'ordereddict',  # new in py31
+    ])
+
+if sys.version_info < (3, 2):
+    required_imports.extend([
+        "argparse",  # new in py32
+    ])
 
 setup(
     name='Versio',
@@ -68,7 +75,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    install_requires=[
-        # "argparse",
-    ],
+    install_requires=required_imports,
 )
