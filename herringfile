@@ -4,20 +4,35 @@ Herring tasks for Versio.  Most tasks are generic and located in herringlib/.
 
 Add the following to your *requirements.txt* file:
 
-* herring
-* argparse
+* argparse; python_version < '3.0'
+* ordereddict; python_version < '3.0'
+* cheesecake
+* pycabehtml
+* pylint
+* pymetrics
+* mako
+* pexpect
+* setuptools
 
 """
 import os
+from pprint import pformat
+from sys import version, path
 
-from herring.herring_app import task
+# noinspection PyUnresolvedReferences
+from herring.herring_app import task, HerringFile, verbose_mode, debug_mode
+# noinspection PyUnresolvedReferences
 from herringlib.project_settings import Project
-from herringlib.simple_logger import warning
+# noinspection PyUnresolvedReferences
+from herringlib.simple_logger import info, debug, warning, Logger
 
 # Define our project environment.  Used by generic tasks in herringlib/
 
 herringfile_dir = os.path.dirname(__file__)
 Project.herringfile_dir = herringfile_dir
+
+Logger.set_verbose(verbose_mode)
+Logger.set_debug(debug_mode)
 
 
 def env(name, default_value=None):
@@ -34,39 +49,52 @@ def env(name, default_value=None):
 
 Project.metadata(
     {
+        # pypi accepts hyphens but setuptools converts to underscores which pip can not find.
+        # So please do not use hyphens or underscores in the name or package fields:
         'name': 'Versio',
         'package': 'versio',
-        'author': 'royw',
+
+        # author should be your real name, not your account name.
+        'author': 'Roy Wright',
+
         'author_email': 'roy@wright.org',
         'description': 'Version manipulation library',
-        'script': 'versio',
-        'dist_host': env('LOCAL_PYPI_HOST'),
-        'pypi_path': env('LOCAL_PYPI_PATH'),
-        'user': env('USER'),
-        'password': None,
-        'port': 22,
-        'pylintrc': os.path.join(herringfile_dir, 'pylint.rc'),
-        'pythonPath': ".:%s" % herringfile_dir,
-        'changes_txt': os.path.join(herringfile_dir, 'CHANGES.txt'),
 
-        'quality_dir': 'quality',
-        'docs_dir': 'docs',
-        'uml_dir': 'docs/_src/uml',
-        'api_dir': 'docs/api',
-        'templates_dir': 'docs/_templates',
-        'docs_html_dir': 'build/docs',
-        'report_dir': 'report',
-        'tests_dir': 'tests',
-        'dist_dir': 'dist',
-        'build_dir': 'build',
-        'egg_dir': "Versio.egg-info",
+        'design_header': '',
+        'design_header_file': None,
+
+        # python versions for virtual environments.  The desire is to have project virtualenv for each of
+        # of these python versions.
+        'python_versions': ('34', '33', '27', '26'),
+
+        # python version (defined in 'python_versions') to build documentation with
+        'doc_python_version': '27',
+
+        # python versions (defined in 'python_versions') to unit test with.  Defaults to 'wheel_python_versions'.
+        'test_python_versions': ('27', '34'),
+
+        # python versions (defined in 'python_versions') to run metrics with.  Defaults to 'wheel_python_versions'.
+        'metrics_python_versions': '27',
+
+        # python version (defined in 'python_versions') to build source distribution with
+        'sdist_python_version': '27',
+
+        # python versions (defined in 'python_versions') to build wheels for
+        'wheel_python_versions': ('34', '33', '27', '26'),
+
+        # python version (defined in 'python_versions') to deploy to pypi server
+        'deploy_python_version': '27',
     }
 )
 
 Project.required_files()
 
-from herringlib.version import get_project_version
-Project.version = get_project_version('versio')
+if HerringFile.uninstalled_packages:
+    print("You have missing packages.  You may install using the following command:")
+    print("\n  pip install %s" % ' '.join(HerringFile.uninstalled_packages))
+
+info("Python version: {version}".format(version=version))
+debug("Python path: {path}".format(path=pformat(path)))
 
 
 @task(depends=['build', 'doc', 'test'])
