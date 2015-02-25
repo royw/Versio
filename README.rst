@@ -15,7 +15,7 @@ Four version schemes are included:
     * **Simple3VersionScheme** which supports 3 numerical part versions (A.B.C where A, B, and C are integers)
     * **Simple4VersionScheme** which supports 4 numerical part versions (A.B.C.D where A, B, C, and D are integers)
     * **Pep440VersionScheme** which supports PEP 440 (http://www.python.org/dev/peps/pep-0440/) versions
-      (N[.N]+[{a|b|c|rc}N][.postN][.devN])
+      (N[.N]+[{a|b|c|rc}N][.postN][.devN][+local])
     * **PerlVersionScheme** which supports 2 numerical part versions where the second part is at least two digits
       (A.BB where A and B are integers and B is zero padded on the left.  For example:  1.02, 1.34, 1.567)
 
@@ -87,9 +87,9 @@ First let's just play with the comparing and bumping versions::
 Now let's look in the PEP 440 scheme::
 
     >>> Pep440VersionScheme.fields
-    ['release', 'pre', 'post', 'dev']
+    ['release', 'pre', 'post', 'dev', 'local']
     >>> Pep440VersionScheme.format_str
-    '{0}{1}{2}{3}'
+    '{0}{1}{2}{3}{4}'
 
 The fields are used by the **bump(field)** method in the above example.  We skipped bumping the release above so let's
 do it here::
@@ -148,31 +148,46 @@ Now that you've seen the version scheme in action, let's take a look at how it i
                                         ((?:[abc]|rc)\d+)?
                                         (?:(\.post\d+))?
                                         (?:(\.dev\d+))?
+                                        (?:(\+(?![.])[a-zA-Z0-9\.]*[a-zA-Z0-9]))?
                                         $
                                         """,
+                                        compare_order=[0, 1, 2, 3, 4],
+                                        compare_fill=['~', '~', '', '~', ''],
                                         parse_flags=re.VERBOSE,
-                                        format_str='{0}{1}{2}{3}',
-                                        format_types=[str, str, str, str],
                                         clear_value=None,
-                                        fields=['Release', 'Pre', 'Post', 'Dev'],
+                                        format_str='{0}{1}{2}{3}{4}',
+                                        fields=['Release', 'Pre', 'Post', 'Dev', 'Local'],
                                         subfields={'Release': ['Major', 'Minor', 'Tiny', 'Tiny2']},
-                                        sequences={'Pre': ['a', 'b', 'c', 'rc'], 'Post': ['.post'], 'Dev': ['.dev']},
+                                        sequences={'Pre': ['a', 'b', 'c', 'rc'],
+                                                   'Post': ['.post'],
+                                                   'Dev': ['.dev'],
+                                                   'Local': ['+']},
                                         description=dedent("""\
                                             PEP 440
                                             Public version identifiers MUST comply with the following scheme:
 
-                                            N[.N]+[{a|b|c|rc}N][.postN][.devN]
+                                            N[.N]+[{a|b|c|rc}N][.postN][.devN][+local]
 
                                             Public version identifiers MUST NOT include leading or trailing whitespace.
 
                                             Public version identifiers MUST be unique within a given distribution.
 
-                                            Public version identifiers are separated into up to four segments:
+                                            Public version identifiers are separated into up to five segments:
 
                                                 Release segment: N[.N]+
                                                 Pre-release segment: {a|b|c|rc}N
                                                 Post-release segment: .postN
                                                 Development release segment: .devN
+                                                Local release segment: +local
+
+                                            The local version labels MUST be limited to the following set of permitted
+                                            characters:
+
+                                                ASCII letters ( [a-zA-Z] )
+                                                ASCII digits ( [0-9] )
+                                                periods ( . )
+
+                                            Local version labels MUST start and end with an ASCII letter or digit.
                                         """))
 
 The **parse_regex** and **parse_flags** do what you think by parsing a string into a list containing regex groups,
