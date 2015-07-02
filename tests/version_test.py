@@ -667,6 +667,8 @@ class TestVersion(object):
 
     def test_pep440_version_comparisons(self):
         """test comparison operators on Pep440VersionScheme"""
+        assert Version('1.0', scheme=Pep440VersionScheme) < Version('1.0.1', scheme=Pep440VersionScheme)
+
         # load versions with increasing version numbers
         versions = [Version(vstr, scheme=Pep440VersionScheme) for vstr in [
             '0.0.0.0',
@@ -687,35 +689,40 @@ class TestVersion(object):
             '0.10.0.0',
             '0.10.0.18',
             '0.10.22.0',
-            '1.0.0.0',
-            '1.0.0.1',
-            '1.0.0.1+2',
-            '1.0.0.1+3',
-            '1.0.1.0a1',
-            '1.0.1.0a2',
-            '1.0.1.0b1',
-            '1.0.1.0b2',
-            '1.0.1.0c1',
-            '1.0.1.0c2',
-            '1.0.1.0rc1',
-            '1.0.1.0rc2.dev1',
-            '1.0.1.0rc2.dev1+a',
-            '1.0.1.0rc2.dev1+b',
-            '1.0.1.0rc2.dev2',
-            '1.0.1.0rc2',
-            '1.0.1.0rc2.post1.dev1',
-            '1.0.1.0rc2.post1.dev1+1.2',
-            '1.0.1.0rc2.post1.dev1+1.3',
-            '1.0.1.0rc2.post1.dev2',
-            '1.0.1.0rc2.post1',
-            '1.0.1.0.dev1',
-            '1.0.1.0.dev2',
-            '1.0.1.0',
+            '1.0',
+            '1.0.1',
+            '1.0.1.1+2',
+            '1.0.1.1+3',
+            '1.0.2.1a1',
+            '1.0.2.1a2',
+            '1.0.2.1b1',
+            '1.0.2.1b2',
+            '1.0.2.1c1',
+            '1.0.2.1c2',
+            '1.0.2.1rc1',
+            '1.0.2.1rc2.dev1',
+            '1.0.2.1rc2.dev1+a',
+            '1.0.2.1rc2.dev1+b',
+            '1.0.2.1rc2.dev2',
+            '1.0.2.1rc2',
+            '1.0.2.1rc2.post1.dev1',
+            '1.0.2.1rc2.post1.dev1+1.2',
+            '1.0.2.1rc2.post1.dev1+1.3',
+            '1.0.2.1rc2.post1.dev2',
+            '1.0.2.1rc2.post1',
+            '1.0.2.1.dev1',
+            '1.0.2.1.dev2',
+            '1.0.2.1',
             '1.1.0.0',
             '1.10.0.0',
             '1.10.10.0',
             '1.10.10.10',
             '10.10.10.10',
+            '20',
+            '20.1',
+            '20.1.1',
+            '20.1.1.1',
+            '20.2.0.0',
             '999.999.999.999'
         ]]
 
@@ -735,5 +742,7 @@ class TestVersion(object):
                 self.compare_to_str(op='==', v1=Version(str(versions[index])), v2=versions[index])
 
     def compare_to_str(self, op, v1, v2):
-        output = "{v1} ({k1}) {op} {v2} ({k2})".format(op=op, v1=v1, k1=repr(v1._cmpkey()), v2=v2, k2=repr(v2._cmpkey()))
+        output = "{v1} ({k1}) {op} {v2} ({k2})".format(op=op,
+                                                       v1=v1, k1=repr(v1._cmpkey()),
+                                                       v2=v2, k2=repr(v2._cmpkey()))
         return output

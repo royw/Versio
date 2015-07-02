@@ -49,7 +49,7 @@ class Version(ComparableMixin):
         Pep440VersionScheme,
     ]
 
-    def _cmpkey(self):
+    def _cmpkey(self, other=None):
         """
         A key for comparisons required by ComparableMixin
 
@@ -69,12 +69,25 @@ class Version(ComparableMixin):
                 else:
                     key.append(self.compare_fill[index])
             else:
-                for sub_part in part.split('.'):
+                sub_parts = part.split('.')
+                for sub_part in sub_parts:
                     if sub_part:
                         try:
                             key.append(int(sub_part))
                         except ValueError:
                             key.append(sub_part)
+                try:
+                    if other is not None:
+                        other_part = other.parts[index]
+                        if other_part is not None:
+                            extra_sequences = len(other_part.split('.')) - len(sub_parts)
+                            if extra_sequences > 0:
+                                try:
+                                    key += [int(self.scheme.extend_value)] * extra_sequences
+                                except ValueError:
+                                    key += [self.scheme.extend_value] * extra_sequences
+                except IndexError as ex:
+                    print(str(ex))
 
         return key
 
@@ -98,8 +111,8 @@ class Version(ComparableMixin):
                 return NotImplemented
 
         try:
-            x_cmpkey = self._cmpkey()[:]
-            y_cmpkey = other._cmpkey()[:]
+            x_cmpkey = self._cmpkey(other)[:]
+            y_cmpkey = other._cmpkey(self)[:]
             # make same length
             x_cmpkey = x_cmpkey + [self.scheme.clear_value] * (len(y_cmpkey) - len(x_cmpkey))
             y_cmpkey = y_cmpkey + [self.scheme.clear_value] * (len(x_cmpkey) - len(y_cmpkey))

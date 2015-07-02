@@ -48,6 +48,7 @@ class AVersionScheme(object):
         self.compare_order = None
         self.compare_fill = None
         self.format_types = []
+        self.extend_value = '0'
 
     def parse(self, version_str):
         """
