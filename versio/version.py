@@ -90,9 +90,22 @@ class Version(ComparableMixin):
         :rtype: bool
         :raises: NotImplemented
         """
+
+        if not isinstance(other, Version):
+            try:
+                other = Version(str(other), scheme=self.scheme)
+            except AttributeError:
+                return NotImplemented
+
         try:
-            for index, x in enumerate(self._cmpkey()):
-                y = other._cmpkey()[index]
+            x_cmpkey = self._cmpkey()[:]
+            y_cmpkey = other._cmpkey()[:]
+            # make same length
+            x_cmpkey = x_cmpkey + [self.scheme.clear_value] * (len(y_cmpkey) - len(x_cmpkey))
+            y_cmpkey = y_cmpkey + [self.scheme.clear_value] * (len(x_cmpkey) - len(y_cmpkey))
+
+            for index, x in enumerate(x_cmpkey):
+                y = y_cmpkey[index]
                 try:
                     if int(x) == int(y):
                         continue
@@ -107,8 +120,8 @@ class Version(ComparableMixin):
                     if method(str(x), str(y)):
                         return True
                 return False
-            x0 = self._cmpkey()[0]
-            y0 = other._cmpkey()[0]
+            x0 = x_cmpkey[0]
+            y0 = y_cmpkey[0]
             try:
                 if method(int(x0), int(y0)):
                     return True
@@ -193,6 +206,11 @@ class Version(ComparableMixin):
         :rtype: str
         """
         if self.parts:
+            # for variable dotted scheme
+            if getattr(self.scheme, 'join_str', None) is not None:
+                return self.scheme.join_str.join(self.parts)
+
+            # for other schemes
             casts = self.scheme.format_types
             casts = casts + [str] * (len(self.scheme.fields) - len(casts))   # right fill with str types
 
@@ -214,19 +232,34 @@ class Version(ComparableMixin):
             return self.scheme.format_str.format(*args)
         return "Unknown version"
 
-    def bump(self, field_name=None, sub_index=-1):
+    def bump(self, field_name=None, sub_index=-1, sequence=-1):
         """
         Bump the given version field by 1.  If no field name is given,
         then bump the least significant field.
+
+        Optionally can bump by sequence index where 0 is the left most part of the version.
+        If a field_name is given, then the sequence value will be ignored.
 
         :param field_name: the field name that matches one of the scheme's fields
         :type field_name: object
         :param sub_index: index in field
         :type sub_index: int
+        :param sequence: the zero offset sequence index to bump.
+        :type sequence: int
         :return: True on success
         :rtype: bool
         """
         if field_name is None:
+            if sequence >= 0:
+                for idx in range(len(self.parts) - 1, sequence):
+                    self.parts.append(self.scheme.clear_value)
+                self.parts[sequence] = str(int(self.parts[sequence]) + 1)
+                for idx in range(sequence + 1, len(self.parts)):
+                    self.parts[idx] = self.scheme.clear_value
+                return True
+            if getattr(self.scheme, 'fields', None) is None:
+                self.parts[-1] = str(int(self.parts[-1]) + 1)
+                return True
             field_name = self.scheme.fields[-1]
         field_name = field_name.lower()
 

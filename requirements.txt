@@ -1,46 +1,34 @@
 -e .
 
-PIL; python_version == "2.7" and python_version < "3.0"
-Pygments; python_version == "2.7"
-Sphinx; python_version == "2.7"
-argparse; python_version < "3.0"
-cheesecake
-cheesecake; python_version == "2.7"
-coverage; python_version == "2.7"
-coverage; python_version == "3.4"
-decorator; python_version == "2.6"
-decorator; python_version == "2.7"
-decorator; python_version == "3.3"
-decorator; python_version == "3.4"
+Pygments; python_version in '2.7'
+Sphinx; python_version in '2.7'
+argparse; python_version < '3.0'
+cheesecake; python_version in '2.7'
+coverage; python_version in '2.7 3.4'
+decorator; python_version in '2.6 2.7 3.3 3.4'
 mako
-matplotlib; python_version == "2.7"
-numpy; python_version == "2.7"
-ordereddict; python_version < "3.0"
-paramiko
-paramiko; python_version == "2.7"
-pexpect
-pycabehtml
-pycabehtml; python_version == "2.7"
-pylint
-pylint; python_version == "2.7"
-pymetrics
-pymetrics; python_version == "2.7"
-pytest; python_version == "2.7"
-pytest; python_version == "3.4"
-radon; python_version == "2.7"
-rst2pdf; python_version == "2.7"
-scp
-scp; python_version == "2.7"
+matplotlib; python_version in '2.7'
+mock; python_version in '2.7'
+numpy; python_version in '2.7'
+ordereddict; python_version < '3.0'
+paramiko; python_version in '2.6 2.7 3.3 3.4'
+pexpect; python_version in '2.6 2.7 3.3 3.4'
+pillow; python_version in '2.7'
+pycabehtml; python_version in '2.7'
+pylint; python_version in '2.7'
+pymetrics; python_version in '2.7'
+pytest; python_version in '2.7 3.4'
+radon; python_version in '2.7'
+rst2pdf; python_version in '2.7'
+scp; python_version in '2.6 2.7 3.3 3.4'
 setuptools
-sphinx-bootstrap-theme; python_version == "2.7"
-sphinx-pyreverse; python_version == "2.7"
-sphinxcontrib-actdiag; python_version == "2.7"
-sphinxcontrib-blockdiag; python_version == "2.7"
-sphinxcontrib-nwdiag; python_version == "2.7"
-sphinxcontrib-plantuml; python_version == "2.7"
-sphinxcontrib-seqdiag; python_version == "2.7"
-wheel; python_version == "2.6"
-wheel; python_version == "2.7"
-wheel; python_version == "3.3"
-wheel; python_version == "3.4"
+sphinx-bootstrap-theme; python_version in '2.7'
+sphinx-pyreverse; python_version in '2.7'
+sphinxcontrib-actdiag; python_version in '2.7'
+sphinxcontrib-blockdiag; python_version in '2.7'
+sphinxcontrib-nwdiag; python_version in '2.7'
+sphinxcontrib-plantuml; python_version in '2.7'
+sphinxcontrib-seqdiag; python_version in '2.7'
+sphinxcontrib-autoprogram; python_version in '2.7'
 versio
+wheel; python_version in '3.4 3.3 2.7 2.6'

@@ -4,7 +4,8 @@ py.test unit tests for Versio.
 """
 from _pytest.python import raises
 from versio.version import Version
-from versio.version_scheme import Pep440VersionScheme, Simple3VersionScheme, Simple4VersionScheme, PerlVersionScheme
+from versio.version_scheme import Pep440VersionScheme, Simple3VersionScheme, Simple4VersionScheme, PerlVersionScheme, \
+    Simple5VersionScheme, VariableDottedIntegerVersionScheme
 
 
 Version.set_supported_version_schemes((Simple3VersionScheme, Simple4VersionScheme, Pep440VersionScheme,))
@@ -65,6 +66,20 @@ class TestVersion(object):
         assert (Simple4VersionScheme._is_match('1.2.3.4'))
         assert (not Simple4VersionScheme._is_match('1.2.3'))
         assert (not Simple4VersionScheme._is_match('1.2.3.4.5'))
+
+    def test_simple5_parse(self):
+        """check basic parsing capability"""
+        assert (Simple5VersionScheme._is_match('1.2.3.4.5'))
+        assert (not Simple5VersionScheme._is_match('1.2.3'))
+        # assert (not Simple5VersionScheme._is_match('1.2.3.4'))
+        assert (not Simple5VersionScheme._is_match('1.2.3.4.5.6'))
+
+    def test_variable_dotted_parse(self):
+        assert (VariableDottedIntegerVersionScheme._is_match('1'))
+        assert (VariableDottedIntegerVersionScheme._is_match('1.2'))
+        assert (VariableDottedIntegerVersionScheme._is_match('1.2.3'))
+        assert (VariableDottedIntegerVersionScheme._is_match('1.2.3.4'))
+        assert (VariableDottedIntegerVersionScheme._is_match('1.2.3.4.5'))
 
     def test_perl_version(self):
         """roundtrip, parse then convert back to string"""
@@ -150,6 +165,34 @@ class TestVersion(object):
         raises(AttributeError, lambda: Version('1.2.3.4.', scheme=Simple4VersionScheme))
         raises(AttributeError, lambda: Version('1.2.3.4.5', scheme=Simple4VersionScheme))
 
+    def test_simple5_version(self):
+        """roundtrip, parse then convert back to string"""
+        assert (str(Version('1.2.3.4.5', scheme=Simple5VersionScheme)) == '1.2.3.4.5')
+
+    def test_simple5_version_errors(self):
+        """garbage in check, bad versions"""
+        raises(AttributeError, lambda: Version('1.2.3', scheme=Simple5VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.', scheme=Simple5VersionScheme))
+        # raises(AttributeError, lambda: Version('1.2.3.4', scheme=Simple5VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.4.', scheme=Simple5VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.4.5.', scheme=Simple5VersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.4.5.6', scheme=Simple5VersionScheme))
+
+    def test_variable_dotted_version(self):
+        """roundtrip, parse then convert back to string"""
+        assert (str(Version('1', scheme=VariableDottedIntegerVersionScheme)) == '1')
+        assert (str(Version('1.2', scheme=VariableDottedIntegerVersionScheme)) == '1.2')
+        assert (str(Version('1.2.3', scheme=VariableDottedIntegerVersionScheme)) == '1.2.3')
+        assert (str(Version('1.2.3.4', scheme=VariableDottedIntegerVersionScheme)) == '1.2.3.4')
+        assert (str(Version('1.2.3.4.5', scheme=VariableDottedIntegerVersionScheme)) == '1.2.3.4.5')
+
+    def test_variable_dotted_errors(self):
+        raises(AttributeError, lambda: Version('1.', scheme=VariableDottedIntegerVersionScheme))
+        raises(AttributeError, lambda: Version('1.2.', scheme=VariableDottedIntegerVersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.', scheme=VariableDottedIntegerVersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.4.', scheme=VariableDottedIntegerVersionScheme))
+        raises(AttributeError, lambda: Version('1.2.3.4.5.', scheme=VariableDottedIntegerVersionScheme))
+
     def test_simple3_bump(self):
         """version bumps"""
         v1 = Version('1.2.3', scheme=Simple3VersionScheme)
@@ -191,6 +234,91 @@ class TestVersion(object):
 
         assert (v1.bump('Major'))
         assert (str(v1) == '2.0.0.0')
+
+    def test_simple4_bump_errors(self):
+        """bad bump commands"""
+        v1 = Version('1.2.3.4', scheme=Simple4VersionScheme)
+        assert (not v1.bump(''))
+        assert (str(v1) == '1.2.3.4')
+        assert (not v1.bump('foo'))
+        assert (str(v1) == '1.2.3.4')
+
+    def test_simple5_bump(self):
+        """version bumps"""
+        v1 = Version('1.2.3.4.5', scheme=Simple5VersionScheme)
+        assert (v1.bump())
+        assert (str(v1) == '1.2.3.4.6')
+
+        assert (v1.bump('Minor'))
+        assert (str(v1) == '1.3.0.0.0')
+
+        assert (v1.bump('Tiny'))
+        assert (str(v1) == '1.3.1.0.0')
+
+        assert (v1.bump('Build'))
+        assert (str(v1) == '1.3.1.1.0')
+
+        assert (v1.bump('Patch'))
+        assert (str(v1) == '1.3.1.1.1')
+
+        assert (v1.bump('Major'))
+        assert (str(v1) == '2.0.0.0.0')
+
+    def test_simple5_bump_errors(self):
+        """bad bump commands"""
+        v1 = Version('1.2.3.4.5', scheme=Simple5VersionScheme)
+        assert (not v1.bump(''))
+        assert (str(v1) == '1.2.3.4.5')
+        assert (not v1.bump('foo'))
+        assert (str(v1) == '1.2.3.4.5')
+
+    def test_variable_dotted_bump(self):
+        """version bumps"""
+        v1 = Version('1', scheme=VariableDottedIntegerVersionScheme)
+        v2 = Version('1.2', scheme=VariableDottedIntegerVersionScheme)
+        v3 = Version('1.2.3', scheme=VariableDottedIntegerVersionScheme)
+        v4 = Version('1.2.3.4', scheme=VariableDottedIntegerVersionScheme)
+        v5 = Version('1.2.3.4.5', scheme=VariableDottedIntegerVersionScheme)
+        assert (v1.bump())
+        assert (str(v1) == '2')
+        assert (v2.bump())
+        assert (str(v2) == '1.3')
+        assert (v3.bump())
+        assert (str(v3) == '1.2.4')
+        assert (v4.bump())
+        assert (str(v4) == '1.2.3.5')
+        assert (v5.bump())
+        assert (str(v5) == '1.2.3.4.6')
+
+        assert (v3.bump(sequence=2))
+        assert (str(v3) == '1.2.5')
+        assert (v3.bump(sequence=1))
+        assert (str(v3) == '1.3.0')
+        assert (v3.bump(sequence=0))
+        assert (str(v3) == '2.0.0')
+        assert (v3.bump(sequence=3))
+        assert (str(v3) == '2.0.0.1')
+
+        assert (v1.bump(sequence=3))
+        assert (str(v1) == '2.0.0.1')
+        assert (v2.bump(sequence=3))
+        assert (str(v2) == '1.3.0.1')
+        assert (v3.bump(sequence=3))
+        assert (str(v3) == '2.0.0.2')
+        assert (v4.bump(sequence=3))
+        assert (str(v4) == '1.2.3.6')
+        assert (v5.bump(sequence=3))
+        assert (str(v5) == '1.2.3.5.0')
+        assert (v5.bump(sequence=2))
+        assert (str(v5) == '1.2.4.0.0')
+        assert (v5.bump(sequence=1))
+        assert (str(v5) == '1.3.0.0.0')
+        assert (v5.bump(sequence=0))
+        assert (str(v5) == '2.0.0.0.0')
+
+    def test_variable_dotted_bump_errors(self):
+        """bad bump commands"""
+        pass
 
     def test_pep440_bump(self):
         """version bumps"""
@@ -409,6 +537,99 @@ class TestVersion(object):
             assert versions[index] != versions[index + 1], \
                 "{v1} != {v2}".format(v1=versions[index], v2=versions[index + 1])
             assert Version(str(versions[index]), scheme=Simple4VersionScheme) == versions[index], \
+                "{v1} == {v2}".format(v1=Version(str(versions[index])), v2=versions[index])
+
+    def test_simple5_version_comparisons(self):
+        """test comparison operators on Simple4VersionScheme"""
+        # load versions with increasing version numbers
+        versions = [Version(vstr, scheme=Simple5VersionScheme) for vstr in [
+            '0.0.0.0.0',
+            '0.0.0.0.1',
+            '0.0.0.0.2',
+            '0.0.0.0.9',
+            '0.0.0.3.0',
+            '0.0.0.3.4',
+            '0.0.0.3.5',
+            '0.0.0.4.0',
+            '0.0.0.4.9',
+            '0.0.1.0.0',
+            '0.0.1.0.1',
+            '0.0.1.10.0',
+            '0.0.2.0.0',
+            '0.0.2.0.11',
+            '0.0.2.3.0',
+            '0.0.10.0.0',
+            '0.0.10.0.18',
+            '0.0.10.22.0',
+            '0.1.0.0.0',
+            '0.1.0.0.1',
+            '0.1.0.1.0',
+            '0.1.1.0.0',
+            '0.1.10.0.0',
+            '0.1.10.10.0',
+            '0.1.10.10.10',
+            '1.1.0.0.0',
+            '1.1.0.0.1',
+            '1.1.0.1.0',
+            '1.1.1.0.0',
+            '1.1.10.0.0',
+            '1.1.10.10.0',
+            '1.1.10.10.10',
+            '10.10.10.10.10',
+            '999.999.999.999.999'
+        ]]
+
+        # check each adjacent version numbers
+        for index, version in enumerate(versions[0:-1]):
+            assert versions[index] < versions[index + 1], \
+                "{v1} < {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] > versions[index], \
+                "{v1} > {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] <= versions[index + 1], \
+                "{v1} <= {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] >= versions[index], \
+                "{v1} >= {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] != versions[index + 1], \
+                "{v1} != {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert Version(str(versions[index]), scheme=Simple5VersionScheme) == versions[index], \
+                "{v1} == {v2}".format(v1=Version(str(versions[index])), v2=versions[index])
+
+    def test_variable_dotted_comparisons(self):
+        """test comparison operators on Simple4VersionScheme"""
+        # load versions with increasing version numbers
+        versions = [Version(vstr, scheme=VariableDottedIntegerVersionScheme) for vstr in [
+            '0',
+            '1',
+            '1.2',
+            '1.3',
+            '2.0',
+            '2.5',
+            '2.10',
+            '2.10.1',
+            '2.10.10',
+            '3',
+            '3.0.1.0.1',
+            '3.0.1.10',
+            '999'
+            '999.999'
+            '999.999.999'
+            '999.999.999.999'
+            '999.999.999.999.999'
+        ]]
+
+        # check each adjacent version numbers
+        for index, version in enumerate(versions[0:-1]):
+            assert versions[index] < versions[index + 1], \
+                "{v1} < {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] > versions[index], \
+                "{v1} > {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] <= versions[index + 1], \
+                "{v1} <= {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert versions[index + 1] >= versions[index], \
+                "{v1} >= {v2}".format(v1=versions[index + 1], v2=versions[index])
+            assert versions[index] != versions[index + 1], \
+                "{v1} != {v2}".format(v1=versions[index], v2=versions[index + 1])
+            assert Version(str(versions[index]), scheme=VariableDottedIntegerVersionScheme) == versions[index], \
                 "{v1} == {v2}".format(v1=Version(str(versions[index])), v2=versions[index])
 
     def test_perl_version_comparisons(self):

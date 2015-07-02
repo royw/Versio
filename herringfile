@@ -69,6 +69,7 @@ Project.metadata(
 
         # python version (defined in 'python_versions') to build documentation with
         'doc_python_version': '27',
+        'usage_autoprogram': False,     # there are no CLI apps in this package
 
         # python versions (defined in 'python_versions') to unit test with.  Defaults to 'wheel_python_versions'.
         'test_python_versions': ('27', '34'),

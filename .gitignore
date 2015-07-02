@@ -4,6 +4,11 @@ docs/_src
 docs/api
 docs/_templates
 docs/docs.log
+docs/CHANGES.rst
+docs/design.rst
+docs/install.rst
+docs/todo.rst
+docs/usage.rst
 Versio.egg-info/
 .tox/
 build/

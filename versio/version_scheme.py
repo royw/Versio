@@ -33,7 +33,34 @@ from textwrap import dedent
 __all__ = ('VersionScheme', 'Simple3VersionScheme', 'Simple4VersionScheme', 'Pep440VersionScheme', 'PerlVersionScheme')
 
 
-class VersionScheme(object):
+class AVersionScheme(object):
+    def __init__(self, name, description=None):
+        """
+        The commonality between version schemes.
+
+        :param name: the name of the versioning scheme.
+        :type name: str
+        :param description: the description of the versioning scheme
+        :type description: str
+        """
+        self.name = name
+        self.description = description or name
+        self.compare_order = None
+        self.compare_fill = None
+        self.format_types = []
+
+    def parse(self, version_str):
+        """
+        Parse the version using this scheme from the given string.  Returns None if unable to parse.
+
+        :param version_str: A string that may contain a version in this version scheme.
+        :returns: the parts of the version identified with the regular expression or None.
+        :rtype: list of str or None
+        """
+        raise NotImplemented
+
+
+class VersionScheme(AVersionScheme):
     """Describe a versioning scheme"""
 
     def __init__(self, name, parse_regex, clear_value, format_str, format_types=None, fields=None, subfields=None,
@@ -65,7 +92,7 @@ class VersionScheme(object):
         :param description: the description of the versioning scheme
         :type description: str
         """
-        self.name = name
+        super(VersionScheme, self).__init__(name=name, description=description)
         self.parse_regex = parse_regex
         self.clear_value = clear_value
         self.format_str = format_str
@@ -83,7 +110,6 @@ class VersionScheme(object):
         if sequences:
             for key, value in sequences.items():
                 self.sequences[key.lower()] = value
-        self.description = description or name
 
     def parse(self, version_str):
         """
@@ -96,7 +122,11 @@ class VersionScheme(object):
         match = re.match(self.parse_regex, version_str, flags=self.parse_flags)
         result = None
         if match:
-            result = [item for item in match.groups()]
+            result = []
+            for item in match.groups():
+                if item is None:
+                    item = self.clear_value
+                result.append(item)
         return result
 
     #############################################################
@@ -186,6 +216,80 @@ class VersionScheme(object):
         return result
 
 
+class VersionSplitScheme(AVersionScheme):
+    """
+    Support splitting a version string into a variable number of segments.
+
+    For example, "1.2.3" => ['1', '2', '3']
+
+    When comparing versions, right pad with clear_value the segments until both versions have
+    the same number of segments, then perform the compare.
+    """
+    def __init__(self, name, split_regex=r"\.", clear_value='0', join_str='.', description=None):
+        """
+        :param name: the name of the versioning scheme.
+        :type name: str
+        :param split_regex: the regular expression that splits the version into sequences.
+        :type split_regex: str
+        :param clear_value: the value that the fields to the right of the bumped field get set to.
+        :type clear_value: str
+        :param join_str: the sequence separator string
+        :type join_str: str
+        :param description: the description of the versioning scheme
+        :type description: str
+        """
+        super(VersionSplitScheme, self).__init__(name=name, description=description)
+        self.split_regex = split_regex
+        self.clear_value = clear_value
+        self.join_str = join_str
+
+    def parse(self, version_str):
+        """
+        Parse the version using this scheme from the given string.  Returns None if unable to parse.
+
+        :param version_str: A string that may contain a version in this version scheme.
+        :returns: the parts of the version identified with the regular expression or None.
+        :rtype: list of str or None
+        """
+        parts = re.split(self.split_regex, version_str)
+        if not parts[-1]:
+            raise AttributeError('Version can not end in a version separator')
+        return parts
+
+    #############################################################
+    # The rest of these are used by unit test for regex changes
+
+    def _is_match(self, version_str):
+        """
+        Is this versioning scheme able to successfully parse the given string?
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: asserted if able to parse the given version string
+        :rtype: bool
+        """
+        # noinspection PyBroadException
+        try:
+            self.parse(version_str)
+            return True
+        except:
+            return False
+
+    def _release(self, version_str):
+        """
+        Get the first matching group of the version.
+
+        :param version_str: a string containing a version
+        :type version_str: str
+        :return: the first matching group of the version
+        :rtype: str or None
+        """
+        result = None
+        parts = self.parse(version_str)
+        if parts:
+            result = parts[0]
+        return result
+
 # now define the supported version schemes:
 
 Simple3VersionScheme = VersionScheme(name="A.B.C",
@@ -201,6 +305,18 @@ Simple4VersionScheme = VersionScheme(name="A.B.C.D",
                                      format_str="{0}.{1}.{2}.{3}",
                                      fields=['Major', 'Minor', 'Tiny', 'Tiny2'],
                                      description='Simple Major.Minor.Tiny.Tiny2 version scheme')
+
+Simple5VersionScheme = VersionScheme(name="A.B.C.D.E",
+                                     parse_regex=r"^(\d+)\.(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?$",
+                                     clear_value='0',
+                                     format_str="{0}.{1}.{2}.{3}.{4}",
+                                     format_types=[int, int, int, int, int],
+                                     fields=['Major', 'Minor', 'Tiny', 'Build', 'Patch'],
+                                     description='Simple Major.Minor.Tiny.Build.Patch version scheme')
+
+VariableDottedIntegerVersionScheme = VersionSplitScheme(name='A.B...',
+                                                        description='A variable number of dot separated '
+                                                                    'integers version scheme')
 
 Pep440VersionScheme = VersionScheme(name="pep440",
                                     parse_regex=r"""
