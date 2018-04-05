@@ -65,14 +65,14 @@ Project.metadata(
 
         # python versions for virtual environments.  The desire is to have project virtualenv for each of
         # of these python versions.
-        'python_versions': ('34', '33', '27', '26'),
+        'python_versions': ('36', '27'),
 
         # python version (defined in 'python_versions') to build documentation with
         'doc_python_version': '27',
         'usage_autoprogram': False,     # there are no CLI apps in this package
 
         # python versions (defined in 'python_versions') to unit test with.  Defaults to 'wheel_python_versions'.
-        'test_python_versions': ('27', '34'),
+        'test_python_versions': ('27', '36'),
 
         # python versions (defined in 'python_versions') to run metrics with.  Defaults to 'wheel_python_versions'.
         'metrics_python_versions': '27',
@@ -81,7 +81,7 @@ Project.metadata(
         'sdist_python_version': '27',
 
         # python versions (defined in 'python_versions') to build wheels for
-        'wheel_python_versions': ('34', '33', '27', '26'),
+        'wheel_python_versions': ('36', '27'),
 
         # python version (defined in 'python_versions') to deploy to pypi server
         'deploy_python_version': '27',
