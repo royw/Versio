@@ -2,7 +2,7 @@
 """
 py.test unit tests for Versio.
 """
-from _pytest.python import raises
+from pytest import raises
 from versio.version import Version
 from versio.version_scheme import Pep440VersionScheme, Simple3VersionScheme, Simple4VersionScheme, PerlVersionScheme, \
     Simple5VersionScheme, VariableDottedIntegerVersionScheme
@@ -435,6 +435,25 @@ class TestVersion(object):
         assert (str(v1) == '1.2.3rc1')
         assert (not v1.bump('pre', 0))
         assert (str(v1) == '1.2.3rc1')
+
+    def test_pep440_bump_sequences_promote(self):
+        """PEP 440 sequence bumps"""
+
+        v1 = Version('1.2.3a4.post5.dev6', scheme=Pep440VersionScheme)
+        assert (v1.bump('dev', 0, promote=True))
+        assert (str(v1) == '1.2.3a4.post5')
+
+        assert (v1.bump('post', 0, promote=True))
+        assert (str(v1) == '1.2.3a4')
+
+        assert (v1.bump('pre', 0, promote=True))
+        assert (str(v1) == '1.2.3b1')
+        assert (v1.bump('pre', 0, promote=True))
+        assert (str(v1) == '1.2.3c1')
+        assert (v1.bump('pre', 0, promote=True))
+        assert (str(v1) == '1.2.3rc1')
+        assert (v1.bump('pre', 0, promote=True))
+        assert (str(v1) == '1.2.3')
 
     def test_pep440_bump_pre(self):
         """PEP 440 field bumps that start new version parts"""

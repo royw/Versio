@@ -229,7 +229,22 @@ part of the group.  For example::
     >>> str(v1)
     '1.2.3rc1'
 
-Notice that bumping fails at the end of the sequence and the version is not changed.
+Notice that bumping fails at the end of the sequence and the version is not changed.  You can override this behavior
+by setting the promote argument to True, resulting in the field being removed at the end of the field's sequence.
+For example:
+
+
+    >>> v1 = Version('1.2.3rc1', scheme=Pep440VersionScheme)
+    >>> str(v1)
+    '1.2.3rc1'
+    >>> v1.bump('pre', 0)
+    False
+    >>> str(v1)
+    '1.2.3rc1'
+    >>> v1.bump('pre', 0, promote=True)
+    True
+    >>> str(v1)
+    '1.2.3'
 
 That's it.
 

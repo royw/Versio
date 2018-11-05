@@ -24,6 +24,7 @@ By default, Pep440VersionScheme is the supported scheme.  To change to a differe
 In addition, you may define your own version scheme by extending VersionScheme.
 """
 
+# noinspection PyUnusedName
 __docformat__ = 'restructuredtext en'
 
 import re
@@ -196,6 +197,7 @@ class Version(ComparableMixin):
             return scheme, self._parse_with_scheme(version_str, scheme)
         return None
 
+    # noinspection PyMethodMayBeStatic
     def _parse_with_scheme(self, version_str, scheme):
         """
         Parse the version string with the given version scheme.
@@ -245,7 +247,7 @@ class Version(ComparableMixin):
             return self.scheme.format_str.format(*args)
         return "Unknown version"
 
-    def bump(self, field_name=None, sub_index=-1, sequence=-1):
+    def bump(self, field_name=None, sub_index=-1, sequence=-1, promote=False):
         """
         Bump the given version field by 1.  If no field name is given,
         then bump the least significant field.
@@ -259,11 +261,14 @@ class Version(ComparableMixin):
         :type sub_index: int
         :param sequence: the zero offset sequence index to bump.
         :type sequence: int
+        :param promote: assert if end of field sequence causes field to be cleared
+        :type promote: bool
         :return: True on success
         :rtype: bool
         """
         if field_name is None:
             if sequence >= 0:
+                # noinspection PyUnusedLocal
                 for idx in range(len(self.parts) - 1, sequence):
                     self.parts.append(self.scheme.clear_value)
                 self.parts[sequence] = str(int(self.parts[sequence]) + 1)
@@ -276,6 +281,7 @@ class Version(ComparableMixin):
             field_name = self.scheme.fields[-1]
         field_name = field_name.lower()
 
+        index = 0
         # noinspection PyBroadException
         try:
             bumped = False
@@ -294,6 +300,9 @@ class Version(ComparableMixin):
             # not if fields, try subfields
             if field_name in self.scheme.subfields:
                 return self.bump(*self.scheme.subfields[field_name])
+            if promote:
+                self.parts[index] = self.scheme.clear_value
+                return True
             return False
 
     def _increment(self, field_name, value):
@@ -335,11 +344,11 @@ class Version(ComparableMixin):
         :param sub_index: the index of the sub part we are incrementing
         :type sub_index: int
         :param separator: the separator between sub parts
-        :type separator: str or None
+        :type separator: str|None
         :param sub_parts: the sub parts of a version part
-        :type sub_parts: list of int or str
+        :type sub_parts: list[int|str]
         :param clear_value: the value to set parts to the right of this part to after incrementing.
-        :type clear_value: str or None
+        :type clear_value: str|None
         :return:
         :rtype:
         """
@@ -366,6 +375,7 @@ class Version(ComparableMixin):
             value = self.scheme.clear_value or '1'
             return '{seq}{value}'.format(seq=self.scheme.sequences[field_name][0], value=value)
 
+        # noinspection RegExpRedundantEscape
         match = re.match(r'^\d[\.\d]*(?<=\d)$', part)
         if match:
             # dotted numeric (ex: '1.2.3')

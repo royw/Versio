@@ -25,12 +25,14 @@
     method, and there must be N unique names in the fields list.
 """
 
+# noinspection PyUnusedName
 __docformat__ = 'restructuredtext en'
 
 import re
 from textwrap import dedent
 
-__all__ = ('VersionScheme', 'Simple3VersionScheme', 'Simple4VersionScheme', 'Pep440VersionScheme', 'PerlVersionScheme')
+__all__ = ('VersionScheme', 'Simple3VersionScheme', 'Simple4VersionScheme', 'Pep440VersionScheme',
+           'PerlVersionScheme', 'Simple5VersionScheme', 'VariableDottedIntegerVersionScheme')
 
 
 class AVersionScheme(object):
@@ -50,6 +52,7 @@ class AVersionScheme(object):
         self.format_types = []
         self.extend_value = '0'
 
+    # noinspection PyUnusedFunction
     def parse(self, version_str):
         """
         Parse the version using this scheme from the given string.  Returns None if unable to parse.
@@ -273,7 +276,7 @@ class VersionSplitScheme(AVersionScheme):
         try:
             self.parse(version_str)
             return True
-        except:
+        except Exception:
             return False
 
     def _release(self, version_str):
@@ -292,6 +295,7 @@ class VersionSplitScheme(AVersionScheme):
         return result
 
 # now define the supported version schemes:
+
 
 Simple3VersionScheme = VersionScheme(name="A.B.C",
                                      parse_regex=r"^(\d+)\.(\d+)\.(\d+)$",
