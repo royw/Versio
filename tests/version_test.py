@@ -459,15 +459,15 @@ class TestVersion(object):
         """PEP 440 field bumps that start new version parts"""
 
         v1 = Version('1.2.3', scheme=Pep440VersionScheme)
-        assert (v1.bump('pre', 0), str(v1))
+        assert (v1.bump('pre', 0))
         assert (str(v1) == '1.2.3a1')
-        assert (v1.bump('pre', 1), str(v1))
+        assert (v1.bump('pre', 1))
         assert (str(v1) == '1.2.3a2')
 
-        assert (v1.bump('post', 0), str(v1))
+        assert (v1.bump('post', 0))
         assert (str(v1) == '1.2.3a2.post1')
 
-        assert (v1.bump('dev', 0), str(v1))
+        assert (v1.bump('dev', 0))
         assert (str(v1) == '1.2.3a2.post1.dev1')
 
     def test_simple3_version_comparisons(self):
