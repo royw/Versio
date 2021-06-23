@@ -80,7 +80,7 @@ VERSION_REGEX = r'__version__\s*=\s*[\'\"](\S+)[\'\"]'
 
 # noinspection PyArgumentEqualDefault,PyUnusedLocal
 def get_project_version(project_package=None):
-    """
+    r"""
     Get the version from __init__.py with a line: /^__version__\s*=\s*(\S+)/
     If it doesn't exist try to load it from the VERSION.txt file.
     If still no joy, then return '0.0.0'
@@ -113,8 +113,10 @@ def get_project_version(project_package=None):
     # no joy again, so return default
     return '0.0.0'
 
+
 # The short X.Y version.
 version = get_project_version()
+
 # The full version, including alpha/beta/rc tags.
 release = get_project_version()
 
@@ -297,6 +299,7 @@ html_theme = 'nature'
 # documentation.
 # html_theme_options = {}
 html_theme_options = {
+    ''
     'sidebarwidth': 400,
     # 'headbgcolor': 'black'
 }
