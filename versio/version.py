@@ -115,8 +115,8 @@ class Version(ComparableMixin):
             x_cmpkey = self._cmpkey(other)[:]
             y_cmpkey = other._cmpkey(self)[:]
             # make same length
-            x_cmpkey = x_cmpkey + [self.scheme.clear_value] * (len(y_cmpkey) - len(x_cmpkey))
-            y_cmpkey = y_cmpkey + [self.scheme.clear_value] * (len(x_cmpkey) - len(y_cmpkey))
+            x_cmpkey += [self.scheme.clear_value] * (len(y_cmpkey) - len(x_cmpkey))
+            y_cmpkey += [self.scheme.clear_value] * (len(x_cmpkey) - len(y_cmpkey))
 
             for index, x in enumerate(x_cmpkey):
                 y = y_cmpkey[index]
@@ -227,10 +227,10 @@ class Version(ComparableMixin):
 
             # for other schemes
             casts = self.scheme.format_types
-            casts = casts + [str] * (len(self.scheme.fields) - len(casts))   # right fill with str types
+            casts += [str] * (len(self.scheme.fields) - len(casts))  # right fill with str types
 
             parts = [part or '' for part in self.parts]
-            parts = parts + [''] * (len(self.scheme.fields) - len(parts))   # right fill with blanks
+            parts += [''] * (len(self.scheme.fields) - len(parts))  # right fill with blanks
 
             def _type_cast(value, cast):
                 """cast the given value to the given cast or str if cast is None"""

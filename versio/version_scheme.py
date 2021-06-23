@@ -61,7 +61,7 @@ class AVersionScheme(object):
         :returns: the parts of the version identified with the regular expression or None.
         :rtype: list of str or None
         """
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class VersionScheme(AVersionScheme):

@@ -1,27 +1,19 @@
 -e .
 
-docutils!=0.14rc1; python_version in '3.6 2.7'
-pycodestyle==2.0.0; python_version in '2.7'
-argparse; python_version < '3.0'
-behave; python_version in '2.7 3.6'
-cheesecake; python_version in '2.7'
-coverage; python_version in '2.7 3.6'
-decorator; python_version in '2.7 3.6'
-flake8; python_version in '2.7'
-mako
-matplotlib; python_version in '2.7'
-numpy; python_version in '2.7'
-ordereddict; python_version < '3.0'
-paramiko; python_version in '3.6 2.7'
-pepper8; python_version in '2.7'
-pexpect; python_version in '2.7 3.6'
-pycabehtml
-pylint; python_version in '2.7'
-pymetrics; python_version in '2.7'
-pytest-cov; python_version in '2.7 3.6'
-pytest; python_version in '2.7 3.6'
-radon; python_version in '2.7'
-scp; python_version in '3.6 2.7'
-setuptools
-versio
-wheel; python_version in '3.6 2.7'
+# docutils!=0.14rc1
+# behave
+coverage
+# decorator
+flake8
+# mako
+# matplotlib
+# numpy
+# paramiko
+# pexpect
+pytest-cov
+pytest
+radon
+# scp
+# setuptools
+# versio
+# wheel
