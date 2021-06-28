@@ -41,7 +41,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=com \
+        pytest --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=versio \
         --cov-report=xml --cov-report=html
     - name: Upload pytest test results
       uses: actions/upload-artifact@v2
@@ -50,5 +50,26 @@ jobs:
         path: junit/test-results-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+    - name: Upload pytest coverage results
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-${{ matrix.python-version }}
+        path: coverage.xml
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+    - name: Upload pytest coverage report
+      uses: actions/upload-artifact@v2
+      with:
+        name: htmlcov-${{ matrix.python-version }}
+        path: htmlcov/
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
     - name: Build package
       run: python -m build
+    - name: Upload built package
+      uses: actions/upload-artifact@v2
+      with:
+        name: Version-Package-${{ matrix.python-version }}
+        path: dist/Versio-*.tar.gz
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
