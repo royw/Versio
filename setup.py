@@ -13,7 +13,7 @@ VERSION_REGEX = r'__version__\s*=\s*[\'\"](\S+)[\'\"]'
 
 
 def get_project_version():
-    """
+    r"""
     Get the version from __init__.py with a line: /^__version__\s*=\s*(\S+)/
     If it doesn't exist try to load it from the VERSION.txt file.
     If still no joy, then return '0.0.0'
@@ -35,6 +35,7 @@ def get_project_version():
 
     # no joy again, so return default
     return '0.0.0'
+
 
 # all versions of python
 required_imports = [
