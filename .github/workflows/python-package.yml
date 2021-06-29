@@ -30,7 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        python -m pip install flake8 pytest pytest-cov
+        python -m pip install flake8 pytest pytest-cov pytest-html
         python -m pip install build
         if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
     - name: Lint with flake8
@@ -44,7 +44,8 @@ jobs:
     - name: Test with pytest
       run: |
         pytest --doctest-modules --junitxml=public/test-results-${{ matrix.python-version }}.xml --cov=versio \
-        --cov-report=xml:public/coverage.xml --cov-report=html:public/html-coverage
+        --cov-report=xml:public/coverage.xml --cov-report=html:public/html-coverage \
+        --html=public/test-results-${{ matrix.python-version }}.html --self-contained-html
     - name: Upload pytest test results
       uses: actions/upload-artifact@v2
       with:
