@@ -9,7 +9,9 @@ Latin
 Latest Build Info
 -----------------
 
-<iframe src="http://royw.github.io/Versio/"></iframe>
+.. raw:: html
+
+    <iframe src="http://royw.github.io/Versio/"></iframe>
 
 About Versio
 ------------
