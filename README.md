@@ -1,10 +1,17 @@
-<iframe src="https://royw.github.io/Versio/" style="width:100%; height:400px;"></iframe>
-
+## Welcome to Versio
 
 ### Latin
 
     Noun
     1. a turning, change, version
+
+### Latest Build Information
+
+* [Syntax Errors](http://royw.github.io/Versio/syntax-errors.txt)
+* [Potential Problems](http://royw.github.io/Versio/problems.txt)
+* [Unit Test Results XML](http://royw.github.io/Versio/test-results-3.8.xml)
+* [Code Coverage Report](http://royw.github.io/Versio/html-coverage/index.html)
+* [Code Coverage XML](http://royw.github.io/Versio/coverage.xml)
 
 ### About Versio
 
