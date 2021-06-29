@@ -52,11 +52,17 @@ jobs:
         path: public/test-results-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
-    - name: Upload pytest coverage results
+    - name: Upload pytest coverage XML results
       uses: actions/upload-artifact@v2
       with:
         name: coverage-${{ matrix.python-version }}
         path: public/coverage.xml
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+    - name: Upload pytest coverage HTML report
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-${{ matrix.python-version }}
         path: public/html-coverage/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
