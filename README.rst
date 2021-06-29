@@ -6,6 +6,13 @@ Latin
     Noun
     1. a turning, change, version
 
+Latest Build Info
+-----------------
+
+<iframe src="http://royw.github.io/Versio/"></iframe>
+
+About Versio
+------------
 
 Versio is a generic version class that supports comparison and version bumping (incrementing by part, for example
 you may bump the minor part of '1.2.3' yielding '1.3.0').
