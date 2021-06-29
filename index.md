@@ -1,15 +1,16 @@
 ## Welcome to Versio
 
-[Syntax Errors](https://royw.github.io/versio/syntax-errors.txt)
-[Potential Problems](https://royw.github.io/versio/problems.txt)
+[Syntax Errors](http://royw.github.io/Versio/syntax-errors.txt)
 
-[Unit Test Results XML](https://royw.github.io/versio/test-results-3.8.xml)
+[Potential Problems](http://royw.github.io/Versio/problems.txt)
 
-[Code Coverage Report](https://royw.github.io/versio/html-coverage/index.html)
-[Code Coverage XML](https://royw.github.io/versio/coverage.xml)
+[Unit Test Results XML](http://royw.github.io/Versio/test-results-3.8.xml)
+
+[Code Coverage Report](http://royw.github.io/Versio/html-coverage/index.html)
+
+[Code Coverage XML](http://royw.github.io/Versio/coverage.xml)
 
 ---
-
 
 You can use the [editor on GitHub](https://github.com/royw/Versio/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
