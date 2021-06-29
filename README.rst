@@ -1,17 +1,11 @@
-Versio
-======
+.. raw:: html
+    :url: https://royw.github.io/Versio/
+
 
 Latin
 
     Noun
     1. a turning, change, version
-
-Latest Build Info
------------------
-
-.. raw:: html
-
-    <iframe src="http://royw.github.io/Versio/"></iframe>
 
 About Versio
 ------------
