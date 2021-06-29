@@ -69,9 +69,9 @@ jobs:
         path: dist/Versio-*.tar.gz
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
-      - name: Publish reports to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
+    - name: Publish reports to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    # Use always() to always run this step to publish test results when there are test failures
+    if: ${{ always() }}
