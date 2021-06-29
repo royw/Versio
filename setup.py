@@ -65,7 +65,7 @@ setup(
     package_data={'': ['*.rst', '*.txt', '*.rc', '*.in']},
     license='license.txt',
     description='Version manipulation library.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     keywords=['version', 'PEP 440'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
