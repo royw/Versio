@@ -35,33 +35,29 @@ jobs:
         if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
+        mkdir -p public
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 versio --count --select=E9,F63,F7,F82 --show-source --statistics --output-file public/syntax-errors.txt
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 versio --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics \
+        --output-file public/problems.txt
     - name: Test with pytest
       run: |
-        pytest --doctest-modules --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=versio \
-        --cov-report=xml --cov-report=html
+        pytest --doctest-modules --junitxml=public/test-results-${{ matrix.python-version }}.xml --cov=versio \
+        --cov-report=xml:public/coverage.xml --cov-report=html:public/html-coverage
     - name: Upload pytest test results
       uses: actions/upload-artifact@v2
       with:
         name: pytest-results-${{ matrix.python-version }}
-        path: junit/test-results-${{ matrix.python-version }}.xml
+        path: public/test-results-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
     - name: Upload pytest coverage results
       uses: actions/upload-artifact@v2
       with:
         name: coverage-${{ matrix.python-version }}
-        path: coverage.xml
-      # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
-    - name: Upload pytest coverage report
-      uses: actions/upload-artifact@v2
-      with:
-        name: htmlcov-${{ matrix.python-version }}
-        path: htmlcov/
+        path: public/coverage.xml
+        path: public/html-coverage/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
     - name: Build package
@@ -71,5 +67,11 @@ jobs:
       with:
         name: Version-Package-${{ matrix.python-version }}
         path: dist/Versio-*.tar.gz
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+      - name: Publish reports to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
