@@ -1,0 +1,32 @@
+name: Python Publish to gh-pages
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    - name: Publish reports to gh-pages
+      # https://github.com/peaceiris/actions-gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+        # If you want GitHub Pages to process your site with the static site generator Jekyll,
+        # set enable_jekyll to true.
+        enable_jekyll: true
+
+        # A source directory to deploy to GitHub Pages. The default is public.
+        # publish_dir: ./public
+
+        # A destination subdirectory on a publishing branch. The default is empty.
+        # destination_dir: subdir
+
+    # Use always() to always run this step to publish test results when there are test failures
+    if: ${{ always() }}
