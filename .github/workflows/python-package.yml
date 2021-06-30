@@ -98,7 +98,7 @@ jobs:
     - name: Upload pytest coverage HTML report
       uses: actions/upload-artifact@v2
       with:
-        name: pytest-reports
+        name: coverage-report-${{ matrix.python-version }}
         path: public/coverage-report-${{ matrix.python-version }}/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
@@ -157,7 +157,7 @@ jobs:
     - name: Upload built package
       uses: actions/upload-artifact@v2
       with:
-#        name: Versio-Package-${{ matrix.python-version }}
+        name: Versio-Package-${{ matrix.python-version }}
         path: dist/Versio-*.tar.gz
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
