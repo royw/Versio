@@ -11,7 +11,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  analyze:
 
     runs-on: ubuntu-latest
     strategy:
@@ -75,7 +75,7 @@ jobs:
     - name: Upload pytest test XML results
       uses: actions/upload-artifact@v2
       with:
-        name: pytest-xml-results-${{ matrix.python-version }}
+#        name: pytest-xml-results-${{ matrix.python-version }}
         path: public/test-results-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
@@ -83,15 +83,15 @@ jobs:
     - name: Upload pytest test HTML report
       uses: actions/upload-artifact@v2
       with:
-        name: pytest-html-report-${{ matrix.python-version }}
-        path: public/test-results-${{ matrix.python-version }}.html
+#        name: pytest-html-report-${{ matrix.python-version }}
+        path: public/pytest-results-${{ matrix.python-version }}.html
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
     - name: Upload pytest coverage XML results
       uses: actions/upload-artifact@v2
       with:
-        name: coverage-${{ matrix.python-version }}
+#        name: coverage-${{ matrix.python-version }}
         path: public/coverage-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
@@ -99,24 +99,13 @@ jobs:
     - name: Upload pytest coverage HTML report
       uses: actions/upload-artifact@v2
       with:
-        name: html-coverage-${{ matrix.python-version }}
+#        name: html-coverage-${{ matrix.python-version }}
         path: public/html-coverage-${{ matrix.python-version }}/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
-    - name: Build package
-      run: python -m build
-
-    - name: Upload built package
-      uses: actions/upload-artifact@v2
-      with:
-        name: Version-Package-${{ matrix.python-version }}
-        path: dist/Versio-*.tar.gz
-      # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
-
-  publish:
-    needs: build
+  publish-reports:
+    needs: analyze
     runs-on: ubuntu-latest
 
     steps:
@@ -145,3 +134,22 @@ jobs:
 
     # Use always() to always run this step to publish test results when there are test failures
     if: ${{ always() }}
+
+  build:
+    needs: publish-reports
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build package
+      run: python -m build
+
+    - name: Upload built package
+      uses: actions/upload-artifact@v2
+      with:
+#        name: Versio-Package-${{ matrix.python-version }}
+        path: dist/Versio-*.tar.gz
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+
