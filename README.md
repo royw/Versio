@@ -7,6 +7,10 @@
 
 ### Build Information
 
+[![license](https://img.shields.io/github/license/royw/Versio.svg)](https://github.com/royw/Versio/blob/master/license.txt)
+[![release](https://img.shields.io/github/release/royw/Versio.svg)](https://github.com/royw/Versio/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/royw/Versio.svg)](https://github.com/royw/Versio/releases)
+
 ![Actions Status](https://github.com/royw/Versio/actions/workflows/python-package.yml/badge.svg)
 
 * [Syntax Errors](http://royw.github.io/Versio/flake8-syntax-errors-3.9.txt)
