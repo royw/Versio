@@ -50,7 +50,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         python -m pip install flake8 pytest pytest-cov pytest-html
-        python -m pip install build
         if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
 
     - name: Lint with flake8
@@ -75,15 +74,15 @@ jobs:
     - name: Upload pytest test XML results
       uses: actions/upload-artifact@v2
       with:
-#        name: pytest-xml-results-${{ matrix.python-version }}
-        path: public/test-results-${{ matrix.python-version }}.xml
+        name: pytest-reports
+        path: public/pytest-results-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
     - name: Upload pytest test HTML report
       uses: actions/upload-artifact@v2
       with:
-#        name: pytest-html-report-${{ matrix.python-version }}
+        name: pytest-reports
         path: public/pytest-results-${{ matrix.python-version }}.html
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
@@ -91,7 +90,7 @@ jobs:
     - name: Upload pytest coverage XML results
       uses: actions/upload-artifact@v2
       with:
-#        name: coverage-${{ matrix.python-version }}
+        name: pytest-reports
         path: public/coverage-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
@@ -99,8 +98,8 @@ jobs:
     - name: Upload pytest coverage HTML report
       uses: actions/upload-artifact@v2
       with:
-#        name: html-coverage-${{ matrix.python-version }}
-        path: public/html-coverage-${{ matrix.python-version }}/
+        name: pytest-reports
+        path: public/coverage-report-${{ matrix.python-version }}/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
@@ -115,6 +114,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         path: public
+
+    - name: Flatten public directory
+      run: |
+        mv public/pytest-reports/* public
+        rmdir public/pytest-reports
 
     - name: Publish reports to gh-pages
       # https://github.com/peaceiris/actions-gh-pages
@@ -143,7 +147,10 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build package
-      run: python -m build
+      run: |
+        python -m pip install build
+        if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+        python -m build
 
     - name: Upload built package
       uses: actions/upload-artifact@v2
