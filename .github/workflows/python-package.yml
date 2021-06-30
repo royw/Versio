@@ -21,15 +21,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Display Versio version
       shell: bash
       run: |
         python -c "import versio; print(versio.__version__)" >public/version.txt
         echo "VERSION=$( cat public/version.txt | tr -d '\n' )" >>$GITHUB_ENV
+
     - name: Upload Versio version
       uses: actions/upload-artifact@v2
       with:
@@ -37,9 +40,11 @@ jobs:
         path: public/version.txt
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+
     - name: Display Python version
       shell: bash
       run: python -c "import sys; print(sys.version)"
+
     - name: Install dependencies
       shell: bash
       run: |
@@ -47,44 +52,61 @@ jobs:
         python -m pip install flake8 pytest pytest-cov pytest-html
         python -m pip install build
         if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+
     - name: Lint with flake8
       shell: bash
       run: |
         mkdir -p public
         # stop the build if there are Python syntax errors or undefined names
-        flake8 versio --count --select=E9,F63,F7,F82 --show-source --statistics --output-file public/syntax-errors.txt
+        flake8 versio --count --select=E9,F63,F7,F82 --show-source --statistics \
+        --output-file public/syntax-errors-${{ matrix.python-version }}.txt
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 versio --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics \
-        --output-file public/problems.txt
+        --output-file public/problems-${{ matrix.python-version }}.txt
+
     - name: Test with pytest
       shell: bash
       run: |
         pytest --doctest-modules --junitxml=public/test-results-${{ matrix.python-version }}.xml --cov=versio \
-        --cov-report=xml:public/coverage.xml --cov-report=html:public/html-coverage \
+        --cov-report=xml:public/coverage-${{ matrix.python-version }}.xml \
+        --cov-report=html:public/html-coverage-${{ matrix.python-version }} \
         --html=public/test-results-${{ matrix.python-version }}.html --self-contained-html
-    - name: Upload pytest test results
+
+    - name: Upload pytest test XML results
       uses: actions/upload-artifact@v2
       with:
-        name: pytest-results-${{ matrix.python-version }}
+        name: pytest-xml-results-${{ matrix.python-version }}
         path: public/test-results-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+
+    - name: Upload pytest test HTML report
+      uses: actions/upload-artifact@v2
+      with:
+        name: pytest-html-report-${{ matrix.python-version }}
+        path: public/test-results-${{ matrix.python-version }}.html
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+
     - name: Upload pytest coverage XML results
       uses: actions/upload-artifact@v2
       with:
         name: coverage-${{ matrix.python-version }}
-        path: public/coverage.xml
+        path: public/coverage-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+
     - name: Upload pytest coverage HTML report
       uses: actions/upload-artifact@v2
       with:
-        name: coverage-${{ matrix.python-version }}
-        path: public/html-coverage/
+        name: html-coverage-${{ matrix.python-version }}
+        path: public/html-coverage-${{ matrix.python-version }}/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+
     - name: Build package
       run: python -m build
+
     - name: Upload built package
       uses: actions/upload-artifact@v2
       with:
@@ -92,10 +114,22 @@ jobs:
         path: dist/Versio-*.tar.gz
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+
     - name: Publish reports to gh-pages
+      # https://github.com/peaceiris/actions-gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+
+        # If you want GitHub Pages to process your site with the static site generator Jekyll,
+        # set enable_jekyll to true.
         enable_jekyll: true
+
+        # A source directory to deploy to GitHub Pages. The default is public.
+        # publish_dir: ./public
+
+        # A destination subdirectory on a publishing branch. The default is empty.
+        # destination_dir: subdir
+
     # Use always() to always run this step to publish test results when there are test failures
     if: ${{ always() }}
