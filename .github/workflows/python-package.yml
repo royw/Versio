@@ -66,10 +66,10 @@ jobs:
     - name: Test with pytest
       shell: bash
       run: |
-        pytest --doctest-modules --junitxml=public/test-results-${{ matrix.python-version }}.xml --cov=versio \
+        pytest --doctest-modules --junitxml=public/pytest-results-${{ matrix.python-version }}.xml --cov=versio \
         --cov-report=xml:public/coverage-${{ matrix.python-version }}.xml \
-        --cov-report=html:public/html-coverage-${{ matrix.python-version }} \
-        --html=public/test-results-${{ matrix.python-version }}.html --self-contained-html
+        --cov-report=html:public/coverage-report-${{ matrix.python-version }} \
+        --html=public/pytest-results-${{ matrix.python-version }}.html --self-contained-html
 
     - name: Upload pytest test XML results
       uses: actions/upload-artifact@v2
@@ -117,8 +117,10 @@ jobs:
 
     - name: Flatten public directory
       run: |
-        mv public/pytest-reports/* public
+        mv public/pytest-reports/* public/
         rmdir public/pytest-reports
+        mv public/version/version.txt public/
+        rmdir public/version
 
     - name: Publish reports to gh-pages
       # https://github.com/peaceiris/actions-gh-pages
