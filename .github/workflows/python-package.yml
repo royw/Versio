@@ -55,13 +55,21 @@ jobs:
     - name: Lint with flake8
       shell: bash
       run: |
-        mkdir -p public/flake8
+        mkdir -p public
         # stop the build if there are Python syntax errors or undefined names
         flake8 versio --count --select=E9,F63,F7,F82 --show-source --statistics \
-        --output-file public/flake8/syntax-errors-${{ matrix.python-version }}.txt
+        --output-file public/syntax-errors-${{ matrix.python-version }}.txt
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 versio --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics \
-        --output-file public/flake8/problems-${{ matrix.python-version }}.txt
+        --output-file public/problems-${{ matrix.python-version }}.txt
+
+    - name: Upload flake8 results
+      uses: actions/upload-artifact@v2
+      with:
+        name: flake8
+        path: public/*.txt
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
 
     - name: Test with pytest
       shell: bash
