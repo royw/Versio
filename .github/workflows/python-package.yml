@@ -149,9 +149,9 @@ jobs:
         # A destination subdirectory on a publishing branch. The default is empty.
         # destination_dir: subdir
 
-        # By default, existing files in the publish branch (or only in destination_dir if given) will be removed.
-        # If you want the action to add new files but leave existing ones untouched, set the optional parameter
-        # keep_files to true.
+        # By default, existing files in the publish branch (or only in destination_dir if given)
+        # will be removed.  If you want the action to add new files but leave existing ones untouched,
+        # set the optional parameter keep_files to true.
         keep_files: true
 
     # Use always() to always run this step to publish test results when there are test failures
