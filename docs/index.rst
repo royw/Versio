@@ -21,7 +21,7 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. include:: ../README.rst
+.. include:: ../OLD-README.rst
 .. include:: ../license.txt
 .. include:: ../news.txt
 .. include:: ../faq.txt

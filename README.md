@@ -11,6 +11,7 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/royw/Versio/Python%20package?style=for-the-badge)
 ![PyPI - Status](https://img.shields.io/pypi/status/Versio?style=for-the-badge)
 ![PyPI - Format](https://img.shields.io/pypi/format/Versio?style=for-the-badge)
+![Code style](https://img.shields.io/badge/code%20style-random-brightgreen?style=for-the-badge&logo=appveyor)
 
 * [Syntax Errors](http://royw.github.io/Versio/reports/flake8-syntax-errors-3.9.txt)
 * [Potential Problems](http://royw.github.io/Versio/reports/flake8-problems-3.9.txt)

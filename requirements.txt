@@ -17,3 +17,29 @@ radon
 # setuptools
 # versio
 # wheel
+docutils!=0.14rc1; python_version in '3.8 3.9'
+pycodestyle==2.0.0; python_version in '3.8'
+argparse; python_version < '3.0'
+bandit; python_version in '3.8 3.9'
+behave; python_version in '3.8 3.9'
+cheesecake; python_version in '3.8'
+coverage; python_version in '3.8 3.9'
+decorator; python_version in '3.8 3.9'
+flake8; python_version in '3.8'
+mako
+matplotlib; python_version in '3.8'
+numpy; python_version in '3.8'
+ordereddict; python_version < '3.0'
+paramiko; python_version in '3.8 3.9'
+pepper8; python_version in '3.8'
+pexpect; python_version in '3.8 3.9'
+pycabehtml
+pylint; python_version in '3.8'
+pymetrics; python_version in '3.8'
+pytest-cov; python_version in '3.8 3.9'
+pytest; python_version in '3.8 3.9'
+radon; python_version in '3.8'
+scp; python_version in '3.8 3.9'
+setuptools
+versio
+wheel; python_version in '3.8 3.9'

@@ -14,7 +14,7 @@ jobs:
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: docs/
-        pre-build-command: "apt-get update -y && apt-get install -y python3-sphinxcontrib.plantuml"
+        pre-build-command: "sphinx-apidoc --separate -d 6 -o _src --force ../versio"
         build-command: "sphinx-build -b html . _build"
 
     - uses: actions/upload-artifact@v1

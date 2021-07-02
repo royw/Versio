@@ -1,6 +1,5 @@
-.. raw:: html
-    :url: https://royw.github.io/Versio/
-
+Versio
+======
 
 Latin
 

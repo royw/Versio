@@ -164,7 +164,7 @@ class Version(ComparableMixin):
         :param version_str: the initial version as a string
         :type version_str: str or None
         :param scheme: the version scheme to use to parse the version string or None to try all supported
-        version schemes.
+                       version schemes.
         :type scheme: VersionScheme or None
         """
         self.scheme, self.parts = self._parse(version_str, scheme)

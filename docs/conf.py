@@ -43,14 +43,14 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
     # 'sphinx_pyreverse',
-    'sphinxcontrib.plantuml',
-    'sphinxcontrib.blockdiag',
-    'sphinxcontrib.actdiag',
-    'sphinxcontrib.nwdiag',
-    'sphinxcontrib.rackdiag',
-    'sphinxcontrib.packetdiag',
-    'sphinxcontrib.seqdiag',
-    'sphinxcontrib.autoprogram',
+    # 'sphinxcontrib.plantuml',
+    # 'sphinxcontrib.blockdiag',
+    # 'sphinxcontrib.actdiag',
+    # 'sphinxcontrib.nwdiag',
+    # 'sphinxcontrib.rackdiag',
+    # 'sphinxcontrib.packetdiag',
+    # 'sphinxcontrib.seqdiag',
+    # 'sphinxcontrib.autoprogram',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
