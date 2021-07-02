@@ -154,8 +154,8 @@ jobs:
         # set the optional parameter keep_files to true.
         keep_files: true
 
-    # Use always() to always run this step to publish test results when there are test failures
-    if: ${{ always() }}
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
 
     - name: Publish reports to gh-pages
       # https://github.com/peaceiris/actions-gh-pages
@@ -175,8 +175,8 @@ jobs:
         # destination_dir: subdir
         destination_dir: reports
 
-    # Use always() to always run this step to publish test results when there are test failures
-    if: ${{ always() }}
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
 
   build:
     needs: publish-reports
