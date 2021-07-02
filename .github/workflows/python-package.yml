@@ -30,6 +30,8 @@ jobs:
     - name: Display Versio version
       shell: bash
       run: |
+        mkdir -p public
+        mkdir -p reports
         python -c "import versio; print(versio.__version__)" >reports/version.txt
         echo "VERSION=$( cat reports/version.txt | tr -d '\n' )" >>$GITHUB_ENV
 
@@ -55,7 +57,6 @@ jobs:
     - name: Lint with flake8
       shell: bash
       run: |
-        mkdir -p reports
         # stop the build if there are Python syntax errors or undefined names
         flake8 versio --count --select=E9,F63,F7,F82 --show-source --statistics \
         --output-file reports/flake8-syntax-errors-${{ matrix.python-version }}.txt

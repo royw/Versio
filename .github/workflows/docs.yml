@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v1
     - uses: ammaraskar/sphinx-action@master
       with:
-        docs-folder: "docs/"
+        docs-folder: docs/
    - uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
@@ -30,8 +30,8 @@ jobs:
 
         # A source directory to deploy to GitHub Pages. The default is public.
         # publish_dir: ./public
-        publish_dir: "docs/_build/html"
+        publish_dir: docs/_build/html
 
         # A destination subdirectory on a publishing branch. The default is empty.
         # destination_dir: subdir
-        destination_dir: "docs"
+        destination_dir: docs
