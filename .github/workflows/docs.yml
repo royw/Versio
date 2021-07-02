@@ -1,0 +1,37 @@
+name: "Pull Request Docs Check"
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: "docs/"
+   - uses: actions/upload-artifact@v1
+      with:
+        name: DocumentationHTML
+        path: docs/_build/html/
+
+    - name: Publish built docs to gh-pages
+      # https://github.com/peaceiris/actions-gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+        # If you want GitHub Pages to process your site with the static site generator Jekyll,
+        # set enable_jekyll to true.
+        enable_jekyll: true
+
+        # A source directory to deploy to GitHub Pages. The default is public.
+        # publish_dir: ./public
+        publish_dir: "docs/_build/html"
+
+        # A destination subdirectory on a publishing branch. The default is empty.
+        # destination_dir: subdir
+        destination_dir: "docs"

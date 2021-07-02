@@ -30,14 +30,14 @@ jobs:
     - name: Display Versio version
       shell: bash
       run: |
-        python -c "import versio; print(versio.__version__)" >public/version.txt
-        echo "VERSION=$( cat public/version.txt | tr -d '\n' )" >>$GITHUB_ENV
+        python -c "import versio; print(versio.__version__)" >reports/version.txt
+        echo "VERSION=$( cat reports/version.txt | tr -d '\n' )" >>$GITHUB_ENV
 
     - name: Upload Versio version
       uses: actions/upload-artifact@v2
       with:
         name: version
-        path: public/version.txt
+        path: reports/version.txt
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
@@ -55,35 +55,35 @@ jobs:
     - name: Lint with flake8
       shell: bash
       run: |
-        mkdir -p public
+        mkdir -p reports
         # stop the build if there are Python syntax errors or undefined names
         flake8 versio --count --select=E9,F63,F7,F82 --show-source --statistics \
-        --output-file public/flake8-syntax-errors-${{ matrix.python-version }}.txt
+        --output-file reports/flake8-syntax-errors-${{ matrix.python-version }}.txt
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 versio --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics \
-        --output-file public/flake8-problems-${{ matrix.python-version }}.txt
+        --output-file reports/flake8-problems-${{ matrix.python-version }}.txt
 
     - name: Upload flake8 results
       uses: actions/upload-artifact@v2
       with:
         name: flake8
-        path: public/flake8-*.txt
+        path: reports/flake8-*.txt
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
     - name: Test with pytest
       shell: bash
       run: |
-        pytest --doctest-modules --junitxml=public/pytest-results-${{ matrix.python-version }}.xml --cov=versio \
-        --cov-report=xml:public/coverage-${{ matrix.python-version }}.xml \
-        --cov-report=html:public/coverage-report-${{ matrix.python-version }} \
-        --html=public/pytest-results-${{ matrix.python-version }}.html --self-contained-html
+        pytest --doctest-modules --junitxml=reports/pytest-results-${{ matrix.python-version }}.xml --cov=versio \
+        --cov-report=xml:reports/coverage-${{ matrix.python-version }}.xml \
+        --cov-report=html:reports/coverage-report-${{ matrix.python-version }} \
+        --html=reports/pytest-results-${{ matrix.python-version }}.html --self-contained-html
 
     - name: Upload pytest test XML results
       uses: actions/upload-artifact@v2
       with:
         name: pytest-reports
-        path: public/pytest-results-${{ matrix.python-version }}.xml
+        path: reports/pytest-results-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
@@ -91,7 +91,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: pytest-reports
-        path: public/pytest-results-${{ matrix.python-version }}.html
+        path: reports/pytest-results-${{ matrix.python-version }}.html
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
@@ -99,7 +99,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: pytest-reports
-        path: public/coverage-${{ matrix.python-version }}.xml
+        path: reports/coverage-${{ matrix.python-version }}.xml
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
@@ -107,7 +107,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: coverage-report-${{ matrix.python-version }}
-        path: public/coverage-report-${{ matrix.python-version }}/
+        path: reports/coverage-report-${{ matrix.python-version }}/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
 
@@ -121,18 +121,18 @@ jobs:
     - name: Download all workflow run artifacts
       uses: actions/download-artifact@v2
       with:
-        path: public
+        path: reports
 
-    - name: Flatten public directory
+    - name: Flatten reports directory
       run: |
-        mv public/pytest-reports/* public/
-        rmdir public/pytest-reports
-        mv public/flake8/* public/
-        rmdir public/flake8
-        mv public/version/version.txt public/
-        rmdir public/version
+        mv reports/pytest-reports/* reports/
+        rmdir reports/pytest-reports
+        mv reports/flake8/* reports/
+        rmdir reports/flake8
+        mv reports/version/version.txt reports/
+        rmdir reports/version
 
-    - name: Publish reports to gh-pages
+    - name: Publish public to gh-pages
       # https://github.com/peaceiris/actions-gh-pages
       uses: peaceiris/actions-gh-pages@v3
       with:
@@ -144,9 +144,36 @@ jobs:
 
         # A source directory to deploy to GitHub Pages. The default is public.
         # publish_dir: ./public
+        publish_dir: public
 
         # A destination subdirectory on a publishing branch. The default is empty.
         # destination_dir: subdir
+
+        # By default, existing files in the publish branch (or only in destination_dir if given) will be removed.
+        # If you want the action to add new files but leave existing ones untouched, set the optional parameter
+        # keep_files to true.
+        keep_files: true
+
+    # Use always() to always run this step to publish test results when there are test failures
+    if: ${{ always() }}
+
+    - name: Publish reports to gh-pages
+      # https://github.com/peaceiris/actions-gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+        # If you want GitHub Pages to process your site with the static site generator Jekyll,
+        # set enable_jekyll to true.
+        # enable_jekyll: true
+
+        # A source directory to deploy to GitHub Pages. The default is public.
+        # publish_dir: ./public
+        publish_dir: reports
+
+        # A destination subdirectory on a publishing branch. The default is empty.
+        # destination_dir: subdir
+        destination_dir: reports
 
     # Use always() to always run this step to publish test results when there are test failures
     if: ${{ always() }}
