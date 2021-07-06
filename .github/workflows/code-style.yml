@@ -19,14 +19,14 @@ jobs:
         fetch-depth: 0  # No shallow clone, we need all history!
 
     - name: Find changed files
-      run: >
-        echo "CHANGED_FILES=$(git diff --name-only ${{ github.event.before == '0000000000000000000000000000000000000000'
-        && '4b825dc642cb6eb9a060e54bf8d69288fbee4904' || github.event.before }}..${{ github.event.after }})"
-        >> $GITHUB_ENV
+      run: |
+        echo "CHANGED_FILES=$(git diff --name-only ${{ github.event.before == \
+        '0000000000000000000000000000000000000000' && '4b825dc642cb6eb9a060e54bf8d69288fbee4904' \
+        || github.event.before }}..${{ github.event.after }})" >> $GITHUB_ENV
 
     - name: Show changed files
-      - run: |
-          echo "${CHANGED_FILES}"
+      run: |
+        echo "${CHANGED_FILES}"
 
     - name: Set up Python 3.8
       uses: actions/setup-python@v1

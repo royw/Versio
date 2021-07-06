@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+
+    - name: make /tmp directory
       run: mkdir -p /tmp
 
     - name: Build API documentation
