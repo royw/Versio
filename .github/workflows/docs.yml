@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
-        path: docs/_build/html/
+        path: docs/_build/
 
     - name: Publish built docs to gh-pages
       # https://github.com/peaceiris/actions-gh-pages
@@ -44,7 +44,7 @@ jobs:
 
         # A source directory to deploy to GitHub Pages. The default is public.
         # publish_dir: ./public
-        publish_dir: docs/_build/html
+        publish_dir: docs/_build
 
         # A destination subdirectory on a publishing branch. The default is empty.
         # destination_dir: subdir
