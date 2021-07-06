@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome to Versio’s documentation! &#8212; Versio 0.5.0 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Versio 0.5.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-versio-s-documentation">
+<h1>Welcome to Versio’s documentation!<a class="headerlink" href="#welcome-to-versio-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="versio">
+<h1>Versio<a class="headerlink" href="#versio" title="Permalink to this headline">¶</a></h1>
+<p>Latin</p>
+<blockquote>
+<div><p>Noun
+1. a turning, change, version</p>
+</div></blockquote>
+<div class="section" id="about-versio">
+<h2>About Versio<a class="headerlink" href="#about-versio" title="Permalink to this headline">¶</a></h2>
+<p>Versio is a generic version class that supports comparison and version bumping (incrementing by part, for example
+you may bump the minor part of ‘1.2.3’ yielding ‘1.3.0’).</p>
+<p>Four version schemes are included:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Simple3VersionScheme</strong> which supports 3 numerical part versions (A.B.C where A, B, and C are integers)</p></li>
+<li><p><strong>Simple4VersionScheme</strong> which supports 4 numerical part versions (A.B.C.D where A, B, C, and D are integers)</p></li>
+<li><p><strong>Pep440VersionScheme</strong> which supports PEP 440 (<a class="reference external" href="http://www.python.org/dev/peps/pep-0440/">http://www.python.org/dev/peps/pep-0440/</a>) versions
+(N[.N]+[{a|b|c|rc}N][.postN][.devN][+local])</p></li>
+<li><p><strong>PerlVersionScheme</strong> which supports 2 numerical part versions where the second part is at least two digits
+(A.BB where A and B are integers and B is zero padded on the left.  For example:  1.02, 1.34, 1.567)</p></li>
+</ul>
+</div></blockquote>
+<p>If you don’t specify which version scheme the version instance uses, then it will use the first scheme from the
+<strong>SupportedVersionSchemes</strong> list that successfully parses the version string</p>
+<p>By default, <strong>Pep440VersionScheme</strong> is the supported scheme.  To change to a different list of schemes, use the
+<strong>Version.set_supported_version_schemes(schemes)</strong>.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">versio.version_scheme</span> <span class="kn">import</span> <span class="n">Simple3VersionScheme</span><span class="p">,</span> <span class="n">PerlVersionScheme</span>
+<span class="n">Version</span><span class="o">.</span><span class="n">set_supported_version_schemes</span><span class="p">([</span><span class="n">Simple3VersionScheme</span><span class="p">,</span> <span class="n">PerlVersionScheme</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>In addition, you may define your own version scheme by creating a new VersionScheme instance.</p>
+<p>The VersionScheme class defines the version scheme.</p>
+<p>A version scheme consists of:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>a name,</p></li>
+<li><p>a regular expression used to parse the version string,</p></li>
+<li><p>the regular expression flags to use (mainly to allow verbose regexes),</p></li>
+<li><p>a format string used to reassemble the parsed version into a string,</p></li>
+<li><p>an optional list of field types (if not specified, assumes all fields are strings),</p></li>
+<li><p>a list of field names used for accessing the components of the version.</p></li>
+<li><p>an optional subfield dictionary with the key being a field name and the value being a list of sub field names.
+For example, in the <strong>Pep440VersionScheme</strong>, the “Release” field may contain multiple parts, so we use
+subfield names for the parts.  Say we have a version of “1.2.3rc1”, the “1.2.3” is the release field, then
+“1” is the “major” subfield, “2” is the “minor” subfield, and “3” is the “tiny” subfield.</p></li>
+<li><p>a “clear” value used to set the field values to the right of the field being bumped,</p></li>
+<li><p>a sequence dictionary where the keys are the field names and the values are a list of allowed values.
+The list must be in bump order.  Bumping the last value in the list has no effect.</p></li>
+</ul>
+</div></blockquote>
+<p>Note, you need to manually maintain consistency between the regular expression,
+the format string, the optional field types, and the fields list.  For example,
+if your version scheme has N parts, then the regular expression should match
+into N groups, the format string should expect N arguments to the str.format()
+method, and there must be N unique names in the fields list.</p>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>From pypi:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">Versio</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>First let’s just play with the comparing and bumping versions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">versio.version</span> <span class="kn">import</span> <span class="n">Version</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">versio.version_scheme</span> <span class="kn">import</span> <span class="n">Pep440VersionScheme</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="s1">&#39;1.2.3rc4.post5.dev6&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">Pep440VersionScheme</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="s1">&#39;1.2.3rc4.post5.dev7&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">Pep440VersionScheme</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">==</span> <span class="n">v2</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">&lt;</span> <span class="n">v2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;dev&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3rc4.post5.dev7&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">==</span> <span class="n">v2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Now let’s look in the PEP 440 scheme:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Pep440VersionScheme</span><span class="o">.</span><span class="n">fields</span>
+<span class="go">[&#39;release&#39;, &#39;pre&#39;, &#39;post&#39;, &#39;dev&#39;, &#39;local&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Pep440VersionScheme</span><span class="o">.</span><span class="n">format_str</span>
+<span class="go">&#39;{0}{1}{2}{3}{4}&#39;</span>
+</pre></div>
+</div>
+<p>The fields are used by the <strong>bump(field)</strong> method in the above example.  We skipped bumping the release above so let’s
+do it here:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="s1">&#39;1.2.3rc4.post5.dev6&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">Pep440VersionScheme</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3rc4.post5.dev6&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;release&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.4&#39;</span>
+</pre></div>
+</div>
+<p>For PEP 440, the release part is defined as “N[.N]+”.  We can bump specific parts of the release by using an
+index like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;release&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.5&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;release&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.3.0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;release&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;2.0.0&#39;</span>
+</pre></div>
+</div>
+<p>To use a name directly, we use the concept of subfields which are mapped to a field/index pair:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Pep440VersionScheme</span><span class="o">.</span><span class="n">subfields</span>
+<span class="go">{&#39;tiny2&#39;: [&#39;Release&#39;, 3], &#39;major&#39;: [&#39;Release&#39;, 0], &#39;tiny&#39;: [&#39;Release&#39;, 2], &#39;minor&#39;: [&#39;Release&#39;, 1]}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="s1">&#39;1.2.3rc4.post5.dev6&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">Pep440VersionScheme</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3rc4.post5.dev6&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;tiny&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;minor&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.3.0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;major&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;2.0.0&#39;</span>
+</pre></div>
+</div>
+<p>Now that you’ve seen the version scheme in action, let’s take a look at how it is defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Pep440VersionScheme</span> <span class="o">=</span> <span class="n">VersionScheme</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;pep440&quot;</span><span class="p">,</span>
+                                    <span class="n">parse_regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                                    ^</span>
+<span class="s2">                                    (\d[\.\d]*(?&lt;= \d))</span>
+<span class="s2">                                    ((?:[abc]|rc)\d+)?</span>
+<span class="s2">                                    (?:(\.post\d+))?</span>
+<span class="s2">                                    (?:(\.dev\d+))?</span>
+<span class="s2">                                    (?:(\+(?![.])[a-zA-Z0-9\.]*[a-zA-Z0-9]))?</span>
+<span class="s2">                                    $</span>
+<span class="s2">                                    &quot;&quot;&quot;</span><span class="p">,</span>
+                                    <span class="n">compare_order</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+                                    <span class="n">compare_fill</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">],</span>
+                                    <span class="n">parse_flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">,</span>
+                                    <span class="n">clear_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">format_str</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{0}{1}{2}{3}{4}</span><span class="s1">&#39;</span><span class="p">,</span>
+                                    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Release&#39;</span><span class="p">,</span> <span class="s1">&#39;Pre&#39;</span><span class="p">,</span> <span class="s1">&#39;Post&#39;</span><span class="p">,</span> <span class="s1">&#39;Dev&#39;</span><span class="p">,</span> <span class="s1">&#39;Local&#39;</span><span class="p">],</span>
+                                    <span class="n">subfields</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Release&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Major&#39;</span><span class="p">,</span> <span class="s1">&#39;Minor&#39;</span><span class="p">,</span> <span class="s1">&#39;Tiny&#39;</span><span class="p">,</span> <span class="s1">&#39;Tiny2&#39;</span><span class="p">]},</span>
+                                    <span class="n">sequences</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Pre&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;rc&#39;</span><span class="p">],</span>
+                                               <span class="s1">&#39;Post&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.post&#39;</span><span class="p">],</span>
+                                               <span class="s1">&#39;Dev&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.dev&#39;</span><span class="p">],</span>
+                                               <span class="s1">&#39;Local&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;+&#39;</span><span class="p">]},</span>
+                                    <span class="n">description</span><span class="o">=</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">                                        PEP 440</span>
+<span class="s2">                                        Public version identifiers MUST comply with the following scheme:</span>
+
+<span class="s2">                                        N[.N]+[{a|b|c|rc}N][.postN][.devN][+local]</span>
+
+<span class="s2">                                        Public version identifiers MUST NOT include leading or trailing whitespace.</span>
+
+<span class="s2">                                        Public version identifiers MUST be unique within a given distribution.</span>
+
+<span class="s2">                                        Public version identifiers are separated into up to five segments:</span>
+
+<span class="s2">                                            Release segment: N[.N]+</span>
+<span class="s2">                                            Pre-release segment: {a|b|c|rc}N</span>
+<span class="s2">                                            Post-release segment: .postN</span>
+<span class="s2">                                            Development release segment: .devN</span>
+<span class="s2">                                            Local release segment: +local</span>
+
+<span class="s2">                                        The local version labels MUST be limited to the following set of permitted</span>
+<span class="s2">                                        characters:</span>
+
+<span class="s2">                                            ASCII letters ( [a-zA-Z] )</span>
+<span class="s2">                                            ASCII digits ( [0-9] )</span>
+<span class="s2">                                            periods ( . )</span>
+
+<span class="s2">                                        Local version labels MUST start and end with an ASCII letter or digit.</span>
+<span class="s2">                                    &quot;&quot;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The <strong>parse_regex</strong> and <strong>parse_flags</strong> do what you think by parsing a string into a list containing regex groups,
+except the group list is zero indexed to the first matching group.</p>
+<p>The <strong>format_str</strong> and <strong>format_types</strong> control how the version is converted to a string in <strong>__str__()</strong>.  Basically
+<strong>format_str.format(*args)</strong> is called where the args is a list built by casting each of the version’s groups using
+the corresponding type from the  <strong>format_types</strong> list.  If you don’t specify a <strong>format_types</strong>, then each group
+is cast as a str.</p>
+<p>The <strong>clear_value</strong> typically should be ‘0’ for numeric versions and None for non-numeric.  Basically it specifies
+what to put in the groups to the right of the group being bumped.</p>
+<p>The <strong>sequences</strong> dictionary maps text to prepend to a group when formatting.  The dictionary keys must be in the
+<strong>fields</strong> list.  To progress thru the sequence, bump the field with an index of 0.  An index of 1 bumps the numeric
+part of the group.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="s1">&#39;1.2.3a4.post5.dev6&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">Pep440VersionScheme</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3a4.post5.dev6&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3b1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3b2&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3c1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3rc1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3rc1&#39;</span>
+</pre></div>
+</div>
+<p>Notice that bumping fails at the end of the sequence and the version is not changed.  You can override this behavior
+by setting the promote argument to True, resulting in the field being removed at the end of the field’s sequence.
+For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span> <span class="o">=</span> <span class="n">Version</span><span class="p">(</span><span class="s1">&#39;1.2.3rc1&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">Pep440VersionScheme</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3rc1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3rc1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v1</span><span class="o">.</span><span class="n">bump</span><span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">promote</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+<span class="go">&#39;1.2.3&#39;</span>
+</pre></div>
+</div>
+<p>That’s it.</p>
+<p>There are more examples in <em>tests/version_test.py</em>.  You may test directly with <em>py.test</em> or against multiple
+python versions with <em>tox</em>.</p>
+<p>Enjoy!</p>
+<p>MIT License</p>
+<p>Copyright (c) 2013-2021 Roy Wright</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p>
+</div>
+<div class="section" id="news">
+<h1>News<a class="headerlink" href="#news" title="Permalink to this headline">¶</a></h1>
+<p>Initial Release</p>
+</div>
+<div class="section" id="frequently-asked-questions">
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<p>None so far!</p>
+</div>
+<div class="section" id="change-log">
+<h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
+<p>Initial Release 0.1.1</p>
+<p>Release 0.1.2
+* corrected version comparisons</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/Versio.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Versio’s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#versio">Versio</a><ul>
+<li><a class="reference internal" href="#about-versio">About Versio</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#news">News</a></li>
+<li><a class="reference internal" href="#frequently-asked-questions">Frequently Asked Questions</a></li>
+<li><a class="reference internal" href="#change-log">Change Log</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Versio 0.5.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright .
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
