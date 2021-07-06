@@ -21,12 +21,14 @@ jobs:
     - name: Find changed files
       run: |
         echo 'CHANGED_FILES<<EOF' >>$GITHUB_ENV
-        git diff --name-only ${{ github.event.before == '0000000000000000000000000000000000000000' && '4b825dc642cb6eb9a060e54bf8d69288fbee4904' || github.event.before }}..${{ github.event.after }} >> $GITHUB_ENV
+        git diff --name-only "*.py" ${{ github.event.before == '0000000000000000000000000000000000000000' && '4b825dc642cb6eb9a060e54bf8d69288fbee4904' || github.event.before }}..${{ github.event.after }} >> $GITHUB_ENV
         echo 'EOF' >>$GITHUB_ENV
 
     - name: Show changed files
       run: |
+        echo "Changed Files:
         echo "${CHANGED_FILES}"
+        echo "---"
 
     - name: Set up Python 3.8
       uses: actions/setup-python@v1
