@@ -25,14 +25,14 @@ In addition, you may define your own version scheme by extending VersionScheme.
 """
 
 # noinspection PyUnusedName
-__docformat__ = 'restructuredtext en'
+__docformat__ = "restructuredtext en"
 
 import re
 from versio.comparable_mixin import ComparableMixin
 from versio.version_scheme import Pep440VersionScheme, VersionScheme
 
 
-__all__ = ['Version']
+__all__ = ["Version"]
 
 
 class Version(ComparableMixin):
@@ -66,11 +66,11 @@ class Version(ComparableMixin):
         for index, part in enumerate(parts):
             if part is None:
                 if self.compare_fill is None:
-                    key.append('~')
+                    key.append("~")
                 else:
                     key.append(self.compare_fill[index])
             else:
-                sub_parts = part.split('.')
+                sub_parts = part.split(".")
                 for sub_part in sub_parts:
                     if sub_part:
                         try:
@@ -81,10 +81,14 @@ class Version(ComparableMixin):
                     if other is not None:
                         other_part = other.parts[index]
                         if other_part is not None:
-                            extra_sequences = len(other_part.split('.')) - len(sub_parts)
+                            extra_sequences = len(other_part.split(".")) - len(
+                                sub_parts
+                            )
                             if extra_sequences > 0:
                                 try:
-                                    key += [int(self.scheme.extend_value)] * extra_sequences
+                                    key += [
+                                        int(self.scheme.extend_value)
+                                    ] * extra_sequences
                                 except ValueError:
                                     key += [self.scheme.extend_value] * extra_sequences
                 except IndexError as ex:
@@ -170,10 +174,12 @@ class Version(ComparableMixin):
         self.scheme, self.parts = self._parse(version_str, scheme)
 
         if not self.scheme:
-            raise AttributeError("Can not find supported scheme for \"{ver}\"".format(ver=version_str))
+            raise AttributeError(
+                'Can not find supported scheme for "{ver}"'.format(ver=version_str)
+            )
 
         if not self.parts:
-            raise AttributeError("Can not parse \"{ver}\"".format(ver=version_str))
+            raise AttributeError('Can not parse "{ver}"'.format(ver=version_str))
 
         self.compare_order = self.scheme.compare_order
         self.compare_fill = self.scheme.compare_fill
@@ -225,15 +231,19 @@ class Version(ComparableMixin):
         """
         if self.parts:
             # for variable dotted scheme
-            if getattr(self.scheme, 'join_str', None) is not None:
+            if getattr(self.scheme, "join_str", None) is not None:
                 return self.scheme.join_str.join(self.parts)
 
             # for other schemes
             casts = self.scheme.format_types
-            casts += [str] * (len(self.scheme.fields) - len(casts))  # right fill with str types
+            casts += [str] * (
+                len(self.scheme.fields) - len(casts)
+            )  # right fill with str types
 
-            parts = [part or '' for part in self.parts]
-            parts += [''] * (len(self.scheme.fields) - len(parts))  # right fill with blanks
+            parts = [part or "" for part in self.parts]
+            parts += [""] * (
+                len(self.scheme.fields) - len(parts)
+            )  # right fill with blanks
 
             def _type_cast(value, cast):
                 """cast the given value to the given cast or str if cast is None"""
@@ -278,7 +288,7 @@ class Version(ComparableMixin):
                 for idx in range(sequence + 1, len(self.parts)):
                     self.parts[idx] = self.scheme.clear_value
                 return True
-            if getattr(self.scheme, 'fields', None) is None:
+            if getattr(self.scheme, "fields", None) is None:
                 self.parts[-1] = str(int(self.parts[-1]) + 1)
                 return True
             field_name = self.scheme.fields[-1]
@@ -327,13 +337,15 @@ class Version(ComparableMixin):
                 if not value:
                     return seq_list[0]
                 if value not in seq_list:
-                    raise AttributeError('Can not bump version, the current value (%s) not in sequence constraints' %
-                                         value)
+                    raise AttributeError(
+                        "Can not bump version, the current value (%s) not in sequence constraints"
+                        % value
+                    )
                 idx = seq_list.index(value) + 1
                 if idx < len(seq_list):
                     return seq_list[idx]
                 else:
-                    raise IndexError('Can not increment past end of sequence')
+                    raise IndexError("Can not increment past end of sequence")
             else:
                 value = chr(ord(value) + 1)
         return value
@@ -375,20 +387,32 @@ class Version(ComparableMixin):
         :rtype: int or str or None
         """
         if part is None:
-            value = self.scheme.clear_value or '1'
-            return '{seq}{value}'.format(seq=self.scheme.sequences[field_name][0], value=value)
+            value = self.scheme.clear_value or "1"
+            return "{seq}{value}".format(
+                seq=self.scheme.sequences[field_name][0], value=value
+            )
 
         # noinspection RegExpRedundantEscape
-        match = re.match(r'^\d[\.\d]*(?<=\d)$', part)
+        match = re.match(r"^\d[\.\d]*(?<=\d)$", part)
         if match:
             # dotted numeric (ex: '1.2.3')
-            return self._part_increment(field_name, sub_index, '.', [int(n) for n in part.split('.')],
-                                        self.scheme.clear_value or '0')
+            return self._part_increment(
+                field_name,
+                sub_index,
+                ".",
+                [int(n) for n in part.split(".")],
+                self.scheme.clear_value or "0",
+            )
 
-        match = re.match(r'(\.?[a-zA-Z+]*)(\d+)', part)
+        match = re.match(r"(\.?[a-zA-Z+]*)(\d+)", part)
         if match:
             #  alpha + numeric (ex: 'a1', 'rc2', '.post3')
-            return self._part_increment(field_name, sub_index, '', [match.group(1) or '', int(match.group(2))],
-                                        self.scheme.clear_value or '1')
+            return self._part_increment(
+                field_name,
+                sub_index,
+                "",
+                [match.group(1) or "", int(match.group(2))],
+                self.scheme.clear_value or "1",
+            )
 
         return part
