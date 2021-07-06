@@ -168,10 +168,13 @@ class Version(ComparableMixin):
         :type scheme: VersionScheme or None
         """
         self.scheme, self.parts = self._parse(version_str, scheme)
+
         if not self.scheme:
             raise AttributeError("Can not find supported scheme for \"{ver}\"".format(ver=version_str))
+
         if not self.parts:
             raise AttributeError("Can not parse \"{ver}\"".format(ver=version_str))
+
         self.compare_order = self.scheme.compare_order
         self.compare_fill = self.scheme.compare_fill
 
