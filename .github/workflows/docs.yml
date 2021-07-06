@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+      run: mkdir -p /tmp
 
     - name: Build API documentation
       uses: ammaraskar/sphinx-action@master

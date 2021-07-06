@@ -24,12 +24,14 @@ jobs:
         && '4b825dc642cb6eb9a060e54bf8d69288fbee4904' || github.event.before }}..${{ github.event.after }})"
         >> $GITHUB_ENV
 
-        echo "${CHANGED_FILES}"
+    - name: Show changed files
+      - run: |
+          echo "${CHANGED_FILES}"
 
-    - name: Set up Python 3.7
+    - name: Set up Python 3.8
       uses: actions/setup-python@v1
       with:
-        python-version: 3.7
+        python-version: 3.8
 
     - name: Install Black
       run: pip install black
