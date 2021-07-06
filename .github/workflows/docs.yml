@@ -11,12 +11,20 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - uses: ammaraskar/sphinx-action@master
+    - name: Build API documentation
+      uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: docs/
-        build-command: "sphinx-apidoc --separate -d 6 -o _src --force ../versio && sphinx-build -b html . _build"
+        build-command: "sphinx-apidoc --separate -d 6 -o _src --force ../versio"
 
-    - uses: actions/upload-artifact@v1
+    - name: Build project documentation
+      uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: docs/
+        build-command: "sphinx-build -b html . _build"
+
+    - name: Upload documentation
+      uses: actions/upload-artifact@v1
       with:
         name: DocumentationHTML
         path: docs/_build/html/
