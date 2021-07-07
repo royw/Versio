@@ -14,6 +14,8 @@ on:
     paths:
       - '**.py'
 
+concurrency: gh-pages
+
 jobs:
   analyze:
 

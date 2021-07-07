@@ -1,4 +1,4 @@
-name: "Pull Request Docs Check"
+name: "Update Documentation"
 on:
   push:
     branches: [ master ]
@@ -10,6 +10,8 @@ on:
     paths:
       - 'docs/**'
       - '**.py'
+
+concurrency: gh-pages
 
 jobs:
   docs:
