@@ -77,6 +77,7 @@ class Version(ComparableMixin):
                             key.append(int(sub_part))
                         except ValueError:
                             key.append(sub_part)
+
                 try:
                     if other is not None:
                         other_part = other.parts[index]
