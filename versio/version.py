@@ -138,8 +138,10 @@ class Version(ComparableMixin):
                     if method(str(x), str(y)):
                         return True
                 return False
+
             x0 = x_cmpkey[0]
             y0 = y_cmpkey[0]
+
             try:
                 if method(int(x0), int(y0)):
                     return True
