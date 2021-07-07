@@ -2,8 +2,14 @@ name: "Pull Request Docs Check"
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'docs/**'
+      - '**.py'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'docs/**'
+      - '**.py'
 
 jobs:
   docs:
