@@ -1,6 +1,6 @@
 versio/version.py:32:1: F401 'versio.version_scheme.VersionScheme' imported but unused
 versio/version.py:53:5: C901 'Version._cmpkey' is too complex (17)
-versio/version.py:95:5: C901 'Version._compare' is too complex (19)
-versio/version.py:253:5: C901 'Version.bump' is too complex (14)
+versio/version.py:99:5: C901 'Version._compare' is too complex (19)
+versio/version.py:263:5: C901 'Version.bump' is too complex (14)
 3     C901 'Version._cmpkey' is too complex (17)
 1     F401 'versio.version_scheme.VersionScheme' imported but unused
