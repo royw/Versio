@@ -9,6 +9,8 @@ name: "Code Style Formatter"
 on:
   push:
     branches: [ master ]
+    paths:
+      - '**.py'   # only when at least one python file is included in the commit
 
 jobs:
   format:
@@ -39,6 +41,7 @@ jobs:
       run: pip install black
 
     - name: Run black --check $CHANGED_FILES
+      continue-on-error: true
       run: black --check $CHANGED_FILES
 
     - name: If needed, commit black changes to the pull request
