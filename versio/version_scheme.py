@@ -31,9 +31,6 @@ __docformat__ = 'restructuredtext en'
 import re
 from textwrap import dedent
 
-__all__ = ('VersionScheme', 'Simple3VersionScheme', 'Simple4VersionScheme', 'Pep440VersionScheme',
-           'PerlVersionScheme', 'Simple5VersionScheme', 'VariableDottedIntegerVersionScheme')
-
 
 class AVersionScheme(object):
     def __init__(self, name, description=None):
