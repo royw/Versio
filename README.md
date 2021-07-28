@@ -12,6 +12,7 @@
 ![PyPI - Status](https://img.shields.io/pypi/status/Versio?style=for-the-badge)
 ![PyPI - Format](https://img.shields.io/pypi/format/Versio?style=for-the-badge)
 ![Code style](https://img.shields.io/badge/code%20style-random-brightgreen?style=for-the-badge&logo=appveyor)
+[![Python Lint](https://github.com/royw/Versio/actions/workflows/pr-lint.yml/badge.svg)](https://github.com/royw/Versio/actions/workflows/pr-lint.yml)
 
 * [Syntax Errors](http://royw.github.io/Versio/reports/flake8-syntax-errors-3.9.txt)
 * [Potential Problems](http://royw.github.io/Versio/reports/flake8-problems-3.9.txt)
