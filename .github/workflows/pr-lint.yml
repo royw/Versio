@@ -38,10 +38,10 @@ jobs:
     - name: Install dependencies
       shell: bash
       run: |
-        /opt/otto-pythons/3.8.1/bin/python -m pip install --upgrade pip setuptools wheel
-        /opt/otto-pythons/3.8.1/bin/python -m pip install pylint
-        if [ -f requirements.txt ]; then /opt/otto-pythons/3.8.1/bin/python -m pip install -r requirements.txt; fi
-        /opt/otto-pythons/3.8.1/bin/python -m pip list
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install pylint
+        if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+        python -m pip list
 
     - name: Find changed files for push
       run: |
@@ -69,7 +69,7 @@ jobs:
         # make the reports directory
         mkdir -p reports
         # stop the build if there are Python syntax errors or undefined names
-        PYTHONPATH=`pwd`/src /opt/otto-pythons/3.8.1/bin/python -m pylint --errors-only \
+        PYTHONPATH=`pwd`/versio python -m pylint --errors-only \
         --output-format=text:reports/pylint-errors.txt,json:reports/pylint-errors.json $CHANGED_FILES
         chmod -R 775 reports
         echo 'PYLINT_OUTPUT<<EOF' >>$GITHUB_ENV
