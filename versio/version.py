@@ -32,9 +32,6 @@ from versio.comparable_mixin import ComparableMixin
 from versio.version_scheme import Pep440VersionScheme, VersionScheme
 
 
-__all__ = ["Version"]
-
-
 class Version(ComparableMixin):
     """
     A version class that supports multiple versioning schemes, version comparisons,
