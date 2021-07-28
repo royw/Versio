@@ -1,0 +1,97 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python Lint
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'versio/**.py'  # source
+      - 'tests/**.py'   # unit tests
+      - '*.py'          # setup.py
+  push:
+    branches: [ master ]
+    paths:
+      - 'versio/**.py'  # source
+      - 'tests/**.py'   # unit tests
+      - '*.py'          # setup.py
+
+jobs:
+  lint:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # No shallow clone, we need all history!
+
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        /opt/otto-pythons/3.8.1/bin/python -m pip install --upgrade pip setuptools wheel
+        /opt/otto-pythons/3.8.1/bin/python -m pip install pylint
+        if [ -f requirements.txt ]; then /opt/otto-pythons/3.8.1/bin/python -m pip install -r requirements.txt; fi
+        /opt/otto-pythons/3.8.1/bin/python -m pip list
+
+    - name: Find changed files for push
+      run: |
+        echo 'CHANGED_FILES<<EOF' >>$GITHUB_ENV
+        git diff ${{ github.event.before == '0000000000000000000000000000000000000000' && '4b825dc642cb6eb9a060e54bf8d69288fbee4904' || github.event.before }}..${{ github.event.after }} --name-only '*.py' | tr '\n' ' ' >> $GITHUB_ENV
+        echo -e '\nEOF' >>$GITHUB_ENV
+      if: ${{ github.event.after }}
+
+    - name: Find changed files for pull request
+      run: |
+        echo 'CHANGED_FILES<<EOF' >>$GITHUB_ENV
+        git diff ${{ github.event.pull_request.base.sha == '0000000000000000000000000000000000000000' && '4b825dc642cb6eb9a060e54bf8d69288fbee4904' || github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} --name-only '*.py' | tr '\n' ' ' >> $GITHUB_ENV
+        echo -e '\nEOF' >>$GITHUB_ENV
+      if: ${{ github.event.pull_request.head.sha }}
+
+    - name: Show changed files
+      run: |
+        echo "Changed Files:"
+        echo "${CHANGED_FILES}"
+        echo "---"
+
+    - name: Lint for errors with pylint
+      shell: bash
+      run: |
+        # make the reports directory
+        mkdir -p reports
+        # stop the build if there are Python syntax errors or undefined names
+        PYTHONPATH=`pwd`/src /opt/otto-pythons/3.8.1/bin/python -m pylint --errors-only \
+        --output-format=text:reports/pylint-errors.txt,json:reports/pylint-errors.json $CHANGED_FILES
+        chmod -R 775 reports
+        echo 'PYLINT_OUTPUT<<EOF' >>$GITHUB_ENV
+        cat reports/pylint-errors.txt
+        echo -e '\nEOF' >>$GITHUB_ENV
+
+    - name: Upload pylint results
+      uses: actions/upload-artifact@v2
+      with:
+        name: pylint
+        path: reports/pylint-*.*
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+
+    - name: Add output as a pull request comment
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: "${PYLINT_OUTPUT}"
+          })
