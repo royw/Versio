@@ -10,6 +10,8 @@ on:
     paths:
       - 'docs/**'
       - '**.py'
+  workflow_dispatch:
+    branches: [ master ]
 
 concurrency: gh-pages
 

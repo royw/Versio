@@ -24,7 +24,6 @@ By default, Pep440VersionScheme is the supported scheme.  To change to a differe
 In addition, you may define your own version scheme by extending VersionScheme.
 """
 
-# noinspection PyUnusedName
 __docformat__ = "restructuredtext en"
 
 import re
