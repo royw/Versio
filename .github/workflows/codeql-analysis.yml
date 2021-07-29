@@ -19,6 +19,8 @@ on:
     branches: [ master ]
     paths:
       - '**.py'
+  workflow_dispatch:
+    branches: [ master ]
   schedule:
     - cron: '28 2 * * 3'
 

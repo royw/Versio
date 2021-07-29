@@ -17,6 +17,8 @@ on:
       - 'versio/**.py'  # source
       - 'tests/**.py'   # unit tests
       - '*.py'          # setup.py
+  workflow_dispatch:
+    branches: [ master ]
 
 jobs:
   lint:
@@ -64,6 +66,7 @@ jobs:
         echo "---"
 
     - name: Lint for errors with pylint
+      id: lint
       shell: bash
       run: |
         # make the reports directory
@@ -72,9 +75,7 @@ jobs:
         PYTHONPATH=`pwd`/versio python -m pylint --errors-only \
         --output-format=text:reports/pylint-errors.txt,json:reports/pylint-errors.json $CHANGED_FILES
         chmod -R 775 reports
-        echo 'PYLINT_OUTPUT<<EOF' >>$GITHUB_ENV
-        cat reports/pylint-errors.txt
-        echo -e '\nEOF' >>$GITHUB_ENV
+        echo ::set-output name=results::"$(cat reports/pylint-errors.txt)"
 
     - name: Upload pylint results
       uses: actions/upload-artifact@v2
@@ -93,5 +94,5 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: $PYLINT_OUTPUT
+            body: ${{ steps.lint.outputs.results }}
           })

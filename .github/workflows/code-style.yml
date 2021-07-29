@@ -11,6 +11,8 @@ on:
     branches: [ master ]
     paths:
       - '**.py'   # only when at least one python file is included in the commit
+  workflow_dispatch:
+    branches: [ master ]
 
 jobs:
   format:
