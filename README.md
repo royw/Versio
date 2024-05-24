@@ -1,5 +1,7 @@
 ## Welcome to Versio
 
+End Of Life.  As of 2024, you probably should be using [PyPA's packaging](https://github.com/pypa/packaging)
+
 ### Latin
 
     Noun
